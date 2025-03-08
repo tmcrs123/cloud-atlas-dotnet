@@ -1,3 +1,7 @@
+using cloud_atlas_dotnet.Data_Access;
+using Microsoft.EntityFrameworkCore;
+using Testcontainers.PostgreSql;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,6 +15,17 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "cloud-atlas-dotnet.xml"));
 });
+
+var postgreSqlContainer = new PostgreSqlBuilder().Build();
+await postgreSqlContainer.StartAsync();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    var connection = postgreSqlContainer.GetConnectionString();
+    options.UseNpgsql(connection);
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
+
 
 var app = builder.Build();
 
