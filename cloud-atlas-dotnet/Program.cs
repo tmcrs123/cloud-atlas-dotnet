@@ -16,7 +16,7 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "cloud-atlas-dotnet.xml"));
 });
 
-var postgreSqlContainer = new PostgreSqlBuilder().WithName("cloud-atlas-postgrest").WithExposedPort(5432).Build();
+var postgreSqlContainer = new PostgreSqlBuilder().WithName("cloud-atlas-postgrest").Build();
 await postgreSqlContainer.StartAsync();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -30,18 +30,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+app.Lifetime.ApplicationStopping.Register(() => postgreSqlContainer.DisposeAsync());
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    SeedData.SeedAndMigrate(services);
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        SeedData.SeedAndMigrate(services);
+    }
 }
 
 app.UseHttpsRedirection();
