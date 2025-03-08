@@ -16,18 +16,26 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "cloud-atlas-dotnet.xml"));
 });
 
-var postgreSqlContainer = new PostgreSqlBuilder().Build();
+var postgreSqlContainer = new PostgreSqlBuilder().WithName("cloud-atlas-postgrest").WithExposedPort(5432).Build();
 await postgreSqlContainer.StartAsync();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connection = postgreSqlContainer.GetConnectionString();
+    Console.WriteLine(connection);
     options.UseNpgsql(connection);
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
 
 var app = builder.Build();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    SeedData.SeedAndMigrate(services);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
