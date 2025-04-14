@@ -1,0 +1,53 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cloud-atlas-dotnet
+    volumes:
+    - ./Infrastructure/Database/Scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  # redis:
+  #   image: redis
+  #   container_name: redis-cache
+  #   ports:
+  #     - "6379:6379"
+
+  # redis-api:
+  #   build: .
+  #   container_name: redis-api
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - ConnectionStrings__Redis=redis:6379
+  #   depends_on:
+  #     - redis
+
+  # seq:
+  #   image: datalust/seq
+  #   container_name: blockbusted-seq
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #   ports:
+  #     - 5341:5341
+  #     - 8081:80
+
+  # rabbitmq:
+  #   image: rabbitmq:management
+  #   container_name: blockbusted.rabbitmq
+  #   hostname: blockbuster-rabbitmq
+  #   ports:
+  #     - 15672:15672  # RabbitMQ Management Console (http://localhost:15672)
+  #     - 5672:5672    # RabbitMQ AMQP port
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: guest
+  #     RABBITMQ_DEFAULT_PASS: guest
+    
+ 
