@@ -39,32 +39,32 @@ FROM user_ids u
 JOIN atlas_ids a ON u.ID IS NOT NULL AND a.ATLAS_ID IS NOT NULL
 LIMIT 10;
 
--- MARKERS (each atlas gets at least one marker)
-WITH atlas_ids AS (
-    SELECT ATLAS_ID FROM ATLAS
-)
-INSERT INTO MARKERS (ATLAS_ID, TITLE, JOURNAL, COORDINATES)
-SELECT 
-    a.ATLAS_ID,
-    'Marker ' || i,
-    'Journal entry for marker ' || i,
-    POINT(random() * 180 - 90, random() * 360 - 180)
-FROM atlas_ids a,
-     generate_series(1, 10) AS s(i)
-LIMIT 10;
+---- MARKERS (each atlas gets at least one marker)
+--WITH atlas_ids AS (
+--    SELECT ATLAS_ID FROM ATLAS
+--)
+--INSERT INTO MARKERS (ATLAS_ID, TITLE, JOURNAL, COORDINATES)
+--SELECT 
+--    a.ATLAS_ID,
+--    'Marker ' || i,
+--    'Journal entry for marker ' || i,
+--    POINT(random() * 180 - 90, random() * 360 - 180)
+--FROM atlas_ids a,
+--     generate_series(1, 10) AS s(i)
+--LIMIT 10;
 
 -- Get 10 marker IDs for images
-WITH marker_ids AS (
-    SELECT MARKER_ID FROM MARKERS LIMIT 10
+WITH atlas_ids AS (
+    SELECT ATLAS_ID FROM ATLAS LIMIT 10
 )
 -- IMAGES
-INSERT INTO IMAGES (MARKER_ID, IMAGE_DETAILS)
+INSERT INTO IMAGES (ATLAS_ID, IMAGE_DETAILS)
 SELECT 
-    m.MARKER_ID,
+    m.ATLAS_ID,
     jsonb_build_object(
         'url', 'https://example.com/image' || i || '.jpg',
         'description', 'Image for marker ' || i
     )
-FROM marker_ids m,
+FROM atlas_ids m,
      generate_series(1, 10) AS s(i)
 LIMIT 10;

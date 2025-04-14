@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS IMAGES (
 	ATLAS_ID UUID PRIMARY KEY,
 	IMAGE_DETAILS JSONB NULL,
 	FOREIGN KEY (ATLAS_ID) REFERENCES ATLAS (ATLAS_ID) ON DELETE CASCADE
-)
+);
 
 -- triggers
 CREATE OR REPLACE FUNCTION create_user_account()
@@ -50,3 +50,29 @@ AFTER INSERT
 ON USERS
 FOR EACH ROW
 EXECUTE FUNCTION create_user_account();
+
+-- procedures
+
+CREATE OR REPLACE PROCEDURE INSERT_IMAGE(
+    image_url VARCHAR(200),
+    id_of_atlas UUID
+) 
+LANGUAGE plpgsql AS $$
+DECLARE
+    image_id UUID;
+BEGIN
+    -- Generate a new UUID for the image
+    SELECT gen_random_uuid() INTO image_id;
+
+    -- Update the images table by appending a new image entry to the JSONB array
+    UPDATE images
+    SET image_details = COALESCE(image_details, '[]'::jsonb) || jsonb_build_array(
+        jsonb_build_object(
+            'imageId', image_id,
+            'legend', '', 
+            'url', image_url
+        )
+    )
+    WHERE images.atlas_id = id_of_atlas;
+END;
+$$;
