@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Data;
+using System.Text.Json;
 
 namespace Cloud_Atlas_Dotnet.Controllers
 {
@@ -260,34 +261,106 @@ namespace Cloud_Atlas_Dotnet.Controllers
 
         [HttpPost]
         [Route("/images/create")]
-        public async Task<IResult> AddImageToAtlas()
+        public async Task<IResult> AddImageToAtlas(CreateImageRequest request)
         {
+            var connection = new NpgsqlConnection(DbConnectionString);
 
-            return Results.Ok("bananas");
+            using (connection)
+            {
+                connection.Open();
+
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "INSERT_IMAGE";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("image_url", request.ImageUri.ToString());
+                cmd.Parameters.AddWithValue("legend", request.Legend);
+                cmd.Parameters.AddWithValue("id_of_atlas", request.AtlasId);
+
+                var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                return Results.Ok(rowsAffected);
+            }
         }
 
         [HttpGet]
         [Route("/images/read")]
-        public async Task<IResult> GetImagesForAtlas()
+        public async Task<IResult> GetImagesForAtlas([FromQuery] GetImagesForAtlasRequest request)
         {
+            var connection = new NpgsqlConnection(DbConnectionString);
+            List<Image> images = new();
 
-            throw new NotImplementedException();
+            using (connection)
+            {
+                connection.Open();
+
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "SELECT jsonb_array_elements(image_details) FROM IMAGES WHERE ATLAS_ID=@atlas_id";
+
+                cmd.Parameters.AddWithValue("atlas_id", request.AtlasId);
+
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                while(await reader.ReadAsync())
+                {
+                    Console.WriteLine(reader);
+                    var img = JsonSerializer.Deserialize<Image>(reader.GetString(0));
+                    images.Add(img);
+                }
+
+                return Results.Ok(images);
+            }
         }
 
         [HttpPut]
         [Route("/images/update")]
-        public async Task<IResult> UpdateImageDetails()
+        public async Task<IResult> UpdateImageDetails(UpdateImageRequest request)
         {
+            var connection = new NpgsqlConnection(DbConnectionString);
 
-            throw new NotImplementedException();
+            using (connection)
+            {
+                connection.Open();
+
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "UPDATE_IMAGE";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("legend", request.Legend);
+                cmd.Parameters.AddWithValue("id_of_atlas", request.AtlasId);
+                cmd.Parameters.AddWithValue("image_id", request.ImageId.ToString());
+
+                var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                return Results.Ok(rowsAffected);
+            }
         }
 
         [HttpDelete]
         [Route("/images/delete")]
-        public async Task<IResult> DeleteImage()
+        public async Task<IResult> DeleteImage(DeleteImageRequest request)
         {
+            var connection = new NpgsqlConnection(DbConnectionString);
 
-            throw new NotImplementedException();
+            using (connection)
+            {
+                connection.Open();
+
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "DELETE_IMAGE";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("id_of_atlas", request.AtlasId);
+                cmd.Parameters.AddWithValue("image_id", request.ImageId.ToString());
+
+                var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                return Results.Ok(rowsAffected);
+            }
         }
     }
 }

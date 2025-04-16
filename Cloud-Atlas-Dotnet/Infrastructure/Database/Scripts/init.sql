@@ -55,6 +55,7 @@ EXECUTE FUNCTION create_user_account();
 
 CREATE OR REPLACE PROCEDURE INSERT_IMAGE(
     image_url VARCHAR(200),
+    legend VARCHAR(100),
     id_of_atlas UUID
 ) 
 LANGUAGE plpgsql AS $$
@@ -69,10 +70,51 @@ BEGIN
     SET image_details = COALESCE(image_details, '[]'::jsonb) || jsonb_build_array(
         jsonb_build_object(
             'imageId', image_id,
-            'legend', '', 
+            'legend', legend, 
             'url', image_url
         )
     )
     WHERE images.atlas_id = id_of_atlas;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE UPDATE_IMAGE(
+    image_id TEXT,
+    id_of_atlas UUID,
+    legend VARCHAR(200)
+)
+LANGUAGE plpgsql 
+AS $$ 
+BEGIN
+    UPDATE images
+    SET image_details = (
+        SELECT jsonb_agg(
+            CASE 
+                WHEN elem->>'imageId' = image_id THEN 
+                    jsonb_set(elem, '{legend}', to_jsonb(legend))
+                ELSE 
+                    elem 
+            END
+        )
+        FROM jsonb_array_elements(image_details) AS elem
+    )
+    WHERE atlas_id = id_of_atlas;
+END; 
+$$;
+
+-- delete an image
+CREATE OR REPLACE PROCEDURE DELETE_IMAGE(
+    image_id TEXT,
+    id_of_atlas UUID
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+	UPDATE images
+	SET image_details = (
+		select jsonb_agg(elem)
+		FROM jsonb_array_elements(image_details) AS elem
+		where elem ->> 'imageId' <> image_id
+	)
+	WHERE atlas_id = id_of_atlas;
+END
+$$

@@ -61,9 +61,12 @@ WITH atlas_ids AS (
 INSERT INTO IMAGES (ATLAS_ID, IMAGE_DETAILS)
 SELECT 
     m.ATLAS_ID,
-    jsonb_build_object(
-        'url', 'https://example.com/image' || i || '.jpg',
-        'description', 'Image for marker ' || i
+    jsonb_build_array(
+        jsonb_build_object(
+            'url', 'https://example.com/image' || i || '.jpg',
+            'legend', 'Image for marker ' || i,
+            'imageId',gen_random_uuid()
+        )
     )
 FROM atlas_ids m,
      generate_series(1, 10) AS s(i)
