@@ -7,12 +7,11 @@ using System.Text.Json;
 
 namespace Cloud_Atlas_Dotnet.Controllers
 {
-    public class TestController : BaseController
+    public class ImageController : BaseController
     {
         public string DbConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=postgres;Database=cloud-atlas-dotnet";
 
         [HttpPost]
-        [Route("/images/create")]
         public async Task<IResult> AddImageToAtlas(CreateImageCommand request)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
@@ -37,7 +36,6 @@ namespace Cloud_Atlas_Dotnet.Controllers
         }
 
         [HttpGet]
-        [Route("/images/read")]
         public async Task<IResult> GetImagesForAtlas([FromQuery] GetImagesForAtlasCommand request)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
@@ -55,7 +53,7 @@ namespace Cloud_Atlas_Dotnet.Controllers
 
                 using var reader = await cmd.ExecuteReaderAsync();
 
-                while(await reader.ReadAsync())
+                while (await reader.ReadAsync())
                 {
                     Console.WriteLine(reader);
                     var img = JsonSerializer.Deserialize<Image>(reader.GetString(0));
@@ -67,7 +65,6 @@ namespace Cloud_Atlas_Dotnet.Controllers
         }
 
         [HttpPut]
-        [Route("/images/update")]
         public async Task<IResult> UpdateImageDetails(UpdateImageCommand request)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
@@ -92,7 +89,6 @@ namespace Cloud_Atlas_Dotnet.Controllers
         }
 
         [HttpDelete]
-        [Route("/images/delete")]
         public async Task<IResult> DeleteImage(DeleteImageCommand request)
         {
             var connection = new NpgsqlConnection(DbConnectionString);

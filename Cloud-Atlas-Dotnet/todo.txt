@@ -1,0 +1,17 @@
+mediator
+CQRS
+fluent
+results
+documentation
+response compression
+serilog
+scalar
+jwt tokens
+authentication
+authorization
+tests
+redis
+exception handling
+env validation
+a filter
+a middleware

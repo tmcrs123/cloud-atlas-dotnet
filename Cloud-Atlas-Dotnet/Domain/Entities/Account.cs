@@ -6,10 +6,4 @@
         public Guid UserId { get; set; }
         public bool IsVerified { get; set; }
     }
-
-    public class VerifyAccountRequest
-    {
-        public bool IsVerified { get; set; }
-        public Guid UserId { get; set; }
-    }
 }

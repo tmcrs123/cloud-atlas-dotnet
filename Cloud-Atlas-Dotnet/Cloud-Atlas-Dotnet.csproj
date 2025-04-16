@@ -13,10 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Domain\Services\" />
     <Folder Include="Infrastructure\Database\Scripts\" />
     <Folder Include="Libraries\" />
-    <Folder Include="Application\Commands\" />
-    <Folder Include="Application\" />
   </ItemGroup>
 
 </Project>

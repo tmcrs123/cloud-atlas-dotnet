@@ -1,4 +1,6 @@
 
+using MediatorLibrary;
+
 namespace Cloud_Atlas_Dotnet
 {
     public class Program
@@ -7,8 +9,9 @@ namespace Cloud_Atlas_Dotnet
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.ConfigureMediator();
 
+            // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();

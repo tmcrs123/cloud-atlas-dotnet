@@ -14,28 +14,5 @@ namespace Cloud_Atlas_Dotnet.Domain.Entities
         public string Legend { get; set; }
     }
 
-    public class CreateImageRequest
-    {
-        public Guid AtlasId { get; set; }
-        public Uri ImageUri { get; set; }
-        public string Legend { get; set; }
-    }
-
-    public class GetImagesForAtlasRequest
-    {
-        public Guid AtlasId { get; set; }
-    }
-
-    public class UpdateImageRequest
-    {
-        public Guid AtlasId { get; set; }
-        public Guid ImageId { get; set; }
-        public string Legend { get; set; }
-    }
-
-    public class DeleteImageRequest
-    {
-        public Guid AtlasId { get; set; }
-        public Guid ImageId { get; set; }
-    }
+    
 }
