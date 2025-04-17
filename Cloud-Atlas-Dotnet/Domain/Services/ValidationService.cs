@@ -1,4 +1,6 @@
 ﻿using Cloud_Atlas_Dotnet.Libraries;
+using Cloud_Atlas_Dotnet.Libraries.FluentValidation;
+using Cloud_Atlas_Dotnet.Libraries.FluentValidation.Interfaces;
 
 namespace Cloud_Atlas_Dotnet.Domain.Services
 {
@@ -18,7 +20,7 @@ namespace Cloud_Atlas_Dotnet.Domain.Services
 
         public ValidationOutcome Validate<T>(T instance)
         {
-            var validator = _serviceProvider.GetService<ISecondValidator<T>>();
+            var validator = _serviceProvider.GetService<IValidator<T>>();
 
             if(validator is null)
                 {

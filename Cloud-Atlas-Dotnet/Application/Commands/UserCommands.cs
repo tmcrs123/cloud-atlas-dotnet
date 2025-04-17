@@ -1,5 +1,5 @@
 ﻿using Cloud_Atlas_Dotnet.Domain.Patterns;
-using Cloud_Atlas_Dotnet.Libraries;
+using Cloud_Atlas_Dotnet.Libraries.FluentValidation;
 using MediatorLibrary;
 using System.Xml.Linq;
 
@@ -14,12 +14,12 @@ namespace Cloud_Atlas_Dotnet.Application.Commands
         public int Whatever { get; set; }
     }
 
-    public class CreateUserCommandValidator : SecondBaseValidator<CreateUserCommand>
+    public class CreateUserCommandValidator : FluentValidator<CreateUserCommand>
     {
         public CreateUserCommandValidator()
         {
-            RuleFor(x => x.Whatever).NotNull().NumberLessThanTarget(10).Even();
-            RuleFor(x => x.Name).NotNull().Not("bananas");
+            RuleFor(x => x.Whatever).NotNull().NumberLessThan(4).Even();
+            RuleFor(x => x.Password).NotNull().DifferentFrom("aa");
         }
     }
 

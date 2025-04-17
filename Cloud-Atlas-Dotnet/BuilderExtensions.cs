@@ -4,6 +4,7 @@ using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Domain.Services;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using Cloud_Atlas_Dotnet.Libraries;
+using Cloud_Atlas_Dotnet.Libraries.FluentValidation.Interfaces;
 using MediatorLibrary;
 
 namespace Cloud_Atlas_Dotnet
@@ -42,7 +43,7 @@ namespace Cloud_Atlas_Dotnet
         {
             builder.Services.AddScoped<IValidationService, ValidationService>();
             //builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
-            builder.Services.AddScoped<ISecondValidator<CreateUserCommand>, CreateUserCommandValidator>();
+            builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
         }
     }
 }
