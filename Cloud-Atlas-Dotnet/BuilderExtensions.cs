@@ -1,7 +1,9 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
 using Cloud_Atlas_Dotnet.Application.Handlers;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
+using Cloud_Atlas_Dotnet.Domain.Services;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
+using Cloud_Atlas_Dotnet.Libraries;
 using MediatorLibrary;
 
 namespace Cloud_Atlas_Dotnet
@@ -31,9 +33,16 @@ namespace Cloud_Atlas_Dotnet
             builder.Services.AddTransient<IRequestHandler<DeleteImageCommand, Result<DeleteImageCommandResponse>>, DeleteImageHandler>();
         }
 
-        public static void ConfigureDependencyInjection(this WebApplicationBuilder builder)
+        public static void ConfigureInfrastructure(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IRepository, Repository>();
+        }
+
+        public static void ConfigureValidations(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IValidationService, ValidationService>();
+            //builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
+            builder.Services.AddScoped<ISecondValidator<CreateUserCommand>, CreateUserCommandValidator>();
         }
     }
 }

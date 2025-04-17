@@ -10,6 +10,8 @@ namespace Cloud_Atlas_Dotnet
             var builder = WebApplication.CreateBuilder(args);
 
             builder.ConfigureMediator();
+            builder.ConfigureInfrastructure();
+            builder.ConfigureValidations();
 
             // Add services to the container.
             builder.Services.AddControllers();

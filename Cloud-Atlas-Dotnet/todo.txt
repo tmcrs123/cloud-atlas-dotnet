@@ -4,7 +4,7 @@ fluent
 results
 documentation
 response compression
-serilog
+serilog / logging
 scalar
 jwt tokens
 authentication
