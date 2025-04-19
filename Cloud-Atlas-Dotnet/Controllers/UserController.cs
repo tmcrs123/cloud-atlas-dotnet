@@ -2,7 +2,6 @@
 using Cloud_Atlas_Dotnet.Domain.Services;
 using MediatorLibrary;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace Cloud_Atlas_Dotnet.Controllers
 {
@@ -28,7 +27,6 @@ namespace Cloud_Atlas_Dotnet.Controllers
 
             //}
             var response = await _mediator.Send(request);
-
              return Results.Created();
         }
 

@@ -1,5 +1,4 @@
-﻿using Cloud_Atlas_Dotnet.Libraries;
-using Cloud_Atlas_Dotnet.Libraries.FluentValidation;
+﻿using Cloud_Atlas_Dotnet.Libraries.FluentValidation;
 using Cloud_Atlas_Dotnet.Libraries.FluentValidation.Interfaces;
 
 namespace Cloud_Atlas_Dotnet.Domain.Services

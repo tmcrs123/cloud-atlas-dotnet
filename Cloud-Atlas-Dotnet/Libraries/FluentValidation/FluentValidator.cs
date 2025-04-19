@@ -61,7 +61,7 @@ namespace Cloud_Atlas_Dotnet.Libraries.FluentValidation
         public ValidationOutcome Validate(T objectToValidate)
         {
             //ALL validators for ALL properties
-            var executedValidatorsResult = _propertyRuleBuilderList.Select(rb => rb.Validate(objectToValidate));
+            var executedValidatorsResult = _propertyRuleBuilderList.Select(rb => rb.Validate(objectToValidate)).ToList();
 
             var allValid = executedValidatorsResult.Distinct().Count() == 1 && executedValidatorsResult.First();
 

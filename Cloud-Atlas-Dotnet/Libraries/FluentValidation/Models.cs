@@ -2,7 +2,7 @@
 {
     public class ValidationOutcome
     {
-        public bool valid => !Failures.Any();
+        public bool Valid => Failures is null || !Failures.Any();
         public List<Failure> Failures = new();
     }
 

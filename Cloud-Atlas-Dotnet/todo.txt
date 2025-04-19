@@ -1,7 +1,4 @@
-mediator
-CQRS
-fluent
-results
+ProblemDetails/CustomProblem details
 documentation
 response compression
 serilog / logging
@@ -13,5 +10,4 @@ tests
 redis
 exception handling
 env validation
-a filter
 a middleware

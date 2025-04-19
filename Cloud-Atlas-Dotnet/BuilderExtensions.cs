@@ -1,4 +1,5 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
+using Cloud_Atlas_Dotnet.Application.Filters;
 using Cloud_Atlas_Dotnet.Application.Handlers;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Domain.Services;
@@ -44,6 +45,8 @@ namespace Cloud_Atlas_Dotnet
             builder.Services.AddScoped<IValidationService, ValidationService>();
             //builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
             builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
+
+            builder.Services.AddScoped<ValidationFilter>();
         }
     }
 }
