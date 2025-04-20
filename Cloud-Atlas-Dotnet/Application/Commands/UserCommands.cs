@@ -17,6 +17,8 @@ namespace Cloud_Atlas_Dotnet.Application.Commands
         public CreateUserCommandValidator()
         {
             RuleFor(x => x.Password).NotNull().DifferentFrom("aa");
+            RuleFor(x => x.Name).NotNull();
+            RuleFor(x => x.Email).MinLength(10).MustBeEmailFormat();
         }
     }
 

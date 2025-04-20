@@ -2,20 +2,25 @@
 {
     public class ValidationOutcome
     {
-        public bool Valid => Failures is null || !Failures.Any();
-        public List<Failure> Failures = new();
+        public bool Valid => ValidationFailures is null || !ValidationFailures.Any();
+        public IDictionary<string, List<ValidationFailure>?> ValidationFailures = new Dictionary<string, List<ValidationFailure>?>();
     }
 
-    public class Failure
+    public class ValidationFailure
     {
         public string PropertyName { get; set; }
         public string ErrorMessage { get; set; }
         public object AttemptedValue { get; set; }
-        public Failure(string propertyName, string errorMessage, object attemptedValue)
+        public ValidationFailure(string propertyName, string errorMessage, object attemptedValue)
         {
             PropertyName = propertyName;
             ErrorMessage = errorMessage;
             AttemptedValue = attemptedValue;
+        }
+
+        public override string ToString()
+        {
+            return $"{PropertyName}: {ErrorMessage}; Attempted value: {AttemptedValue}";
         }
     }
 }

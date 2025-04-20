@@ -3,17 +3,17 @@
     public class Result
     {
         public bool IsSuccess { get; set; }
-        public string Error { get; set; }
+        public ApplicationError Error { get; set; }
         public bool isFailure => !IsSuccess;
 
-        public Result(bool isSuccess, string error)
+        public Result(bool isSuccess, ApplicationError? error)
         {
-            if (isFailure && string.IsNullOrEmpty(Error))
+            if (isFailure && error is null)
             {
                 throw new InvalidOperationException("Failure must have an error");
             }
 
-            if (isSuccess && !string.IsNullOrEmpty(Error))
+            if (isSuccess && error is not null)
             {
                 throw new InvalidOperationException("Success cannot have an error");
             }
@@ -24,10 +24,10 @@
 
         public static Result Success()
         {
-            return new Result(true, string.Empty);
+            return new Result(true, null);
         }
 
-        public static Result Failure(string error)
+        public static Result Failure(ApplicationError error)
         {
             return new Result(false, error);
         }
@@ -37,17 +37,17 @@
     {
         public T Value { get; set; }
 
-        public Result(T value, bool isSuccess, string error) : base(isSuccess, error)
+        public Result(T value, bool isSuccess, ApplicationError error) : base(isSuccess, error)
         {
             Value = value;
         }
 
         public static Result Success(T value)
         {
-            return new Result<T>(value, true, string.Empty);
+            return new Result<T>(value, true, null);
         }
 
-        public static Result Failure(T value, string error)
+        public static Result Failure(T value, ApplicationError error)
         {
             return new Result<T>(default(T), false, error);
         }

@@ -1,4 +1,5 @@
-﻿using Cloud_Atlas_Dotnet.Domain.Services;
+﻿using Cloud_Atlas_Dotnet.Domain.Patterns;
+using Cloud_Atlas_Dotnet.Domain.Services;
 using Cloud_Atlas_Dotnet.Libraries.FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -39,7 +40,9 @@ namespace Cloud_Atlas_Dotnet.Application.Filters
 
             if (!validationOutcome.Valid)
             {
-                context.Result = new BadRequestObjectResult(new ProblemDetails() { Detail = "Some Error detail"});
+                ApplicationError error = new ApplicationError(ErrorType.Validation, validationOutcome.ValidationFailures.ToDictionary(kvp => kvp.Key, kvp => (object?)kvp.Value));
+
+                context.Result = new BadRequestObjectResult(error.ProblemDetails);
             }
         }
     }

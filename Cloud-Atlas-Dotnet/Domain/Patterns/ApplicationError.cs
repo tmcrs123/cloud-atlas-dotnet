@@ -11,31 +11,39 @@ namespace Cloud_Atlas_Dotnet.Domain.Patterns
         Conflict = 3,
         Unauthorized = 4
     }
-    
+
     public class ApplicationError
     {
         public ErrorType ErrorType;
         public ProblemDetails ProblemDetails;
 
-        public ApplicationError(ErrorType errorType, IDictionary<string,object?>? problemDetailsExtensions)
+        public ApplicationError(ErrorType errorType, IDictionary<string, object?> problemDetailsExtensions)
         {
             ErrorType = errorType;
-
             ProblemDetails = new ProblemDetails();
 
-            if(problemDetailsExtensions is not null) ProblemDetails.Extensions = problemDetailsExtensions;
+            if (problemDetailsExtensions is not null) ProblemDetails.Extensions = problemDetailsExtensions;
 
             switch (errorType)
             {
-
                 case ErrorType.Validation:
                     ProblemDetails.Title = "Validation Error";
                     ProblemDetails.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
                     ProblemDetails.Status = (int?)HttpStatusCode.BadRequest;
 
+                    if (problemDetailsExtensions is null)
+                    {
+                        throw new InvalidOperationException("Error of type validation must include problem details extensions");
+                    }
+
+                    ProblemDetails.Extensions = new Dictionary<string, object?>()
+                    {
+                        ["ValidationErrors"] = problemDetailsExtensions
+                    };
+
                     break;
                 case ErrorType.NotFound:
-                    ProblemDetails.Title =  "Not Found Error";
+                    ProblemDetails.Title = "Not Found Error";
                     ProblemDetails.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4";
                     ProblemDetails.Status = (int?)HttpStatusCode.NotFound;
                     break;
@@ -56,7 +64,6 @@ namespace Cloud_Atlas_Dotnet.Domain.Patterns
                     ProblemDetails.Status = (int?)HttpStatusCode.InternalServerError;
                     break;
             }
-
         }
 
 

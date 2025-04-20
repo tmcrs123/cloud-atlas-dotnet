@@ -9,6 +9,6 @@
     {
         bool Validate(T instance);
 
-        List<Failure> Failures { get; }
+        Dictionary<string, List<ValidationFailure>> Failures { get; }
     }
 }

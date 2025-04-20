@@ -3,14 +3,14 @@ using System.Linq.Expressions;
 
 namespace Cloud_Atlas_Dotnet.Libraries.FluentValidation
 {
-    public class PropertyRuleBuilder<T, TProperty> : IPropertyRuleBuilder<T>
+    public class    PropertyRuleBuilder<T, TProperty> : IPropertyRuleBuilder<T>
     {
         private readonly Expression<Func<T, TProperty>> _propertySelectorExpression;
         private readonly Func<T, TProperty> _propertySelector;
         
         internal readonly string _propertyName;
         internal List<Func<TProperty, bool>> validationFns = new();
-        public List<Failure> Failures { get; set; } = new();
+        public Dictionary<string, List<ValidationFailure>> Failures { get; set; } = new Dictionary<string, List<ValidationFailure>>();
 
         public PropertyRuleBuilder(Expression<Func<T, TProperty>> propertySelectorExpression)
         {
@@ -42,7 +42,7 @@ namespace Cloud_Atlas_Dotnet.Libraries.FluentValidation
         {
             var propertyValue = _propertySelector(objectToValidate);
 
-            IEnumerable<bool> executedValidatorsResults = validationFns.Select(fn => fn(propertyValue));
+            IEnumerable<bool> executedValidatorsResults = validationFns.Select(fn => fn(propertyValue)).ToList();
 
             return executedValidatorsResults.Distinct().Count() == 1 && executedValidatorsResults.First();
         }
@@ -65,12 +65,12 @@ namespace Cloud_Atlas_Dotnet.Libraries.FluentValidation
 
             var allValid = executedValidatorsResult.Distinct().Count() == 1 && executedValidatorsResult.First();
 
-            if (allValid) return new ValidationOutcome() { Failures = null };
+            if (allValid) return new ValidationOutcome() { ValidationFailures = null };
             else
             {
-                var allFailures = _propertyRuleBuilderList.Select(x => x.Failures).SelectMany(x => x).ToList();
+                var allFailures = _propertyRuleBuilderList.Select(x => x.Failures).SelectMany(x => x).ToDictionary();
 
-                return new ValidationOutcome() { Failures = allFailures };
+                return new ValidationOutcome() { ValidationFailures = allFailures };
             } 
                 
         }
