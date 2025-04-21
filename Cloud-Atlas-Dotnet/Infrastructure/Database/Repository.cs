@@ -1,6 +1,5 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
 using Cloud_Atlas_Dotnet.Domain.Entities;
-using MediatorLibrary;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Data;
@@ -12,7 +11,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
     {
         public string DbConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=postgres;Database=cloud-atlas-dotnet";
 
-        public async Task<IResult> CreateUser(CreateUserCommand request)
+        public async Task<Guid> CreateUser(string name, string username, string email, string password)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
 
@@ -22,19 +21,56 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 var cmd = connection.CreateCommand();
 
-                cmd.CommandText = "insert into users (name, username,email,password) values (@name, @username,@email,@password)";
+                cmd.CommandText = "insert into users (name, username,email,password) values (@name, @username,@email,@password) returning Id";
 
-                cmd.Parameters.AddWithValue("name", request.Name);
-                cmd.Parameters.AddWithValue("username", request.Username);
-                cmd.Parameters.AddWithValue("email", request.Email);
-                cmd.Parameters.AddWithValue("password", request.Password);
+                cmd.Parameters.AddWithValue("name", name);
+                cmd.Parameters.AddWithValue("username", username);
+                cmd.Parameters.AddWithValue("email", email);
+                cmd.Parameters.AddWithValue("password", password);
 
-                var rowsAffected = await cmd.ExecuteNonQueryAsync();
-                return Results.Ok(rowsAffected);
+                var result = await cmd.ExecuteScalarAsync();
+
+                if(result is Guid newUserId)
+                {
+                    return newUserId;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Failed to convert value {result} to a valid Guid when creating new user");
+                }
             }
         }
 
-        public async Task<IResult> GetUser([FromQuery] Guid id)
+        public async Task<bool> UsernameExists(string username)
+        {
+            var connection = new NpgsqlConnection(DbConnectionString);
+
+            using (connection)
+            {
+                connection.Open();
+
+                var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "select COUNT(id) from users where username=@username";
+
+                cmd.Parameters.AddWithValue("username", username);
+
+                var reader = await cmd.ExecuteReaderAsync();
+
+                int count = -1;
+
+                if (!reader.HasRows) return false;
+
+                while (await reader.ReadAsync())
+                {
+                    count = reader.GetInt32(0);
+                }
+
+                return count == 1;
+            }
+        }
+
+        public async Task<User> GetUser(Guid id)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
 
@@ -50,7 +86,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                if (!reader.HasRows) return Results.NotFound();
+                if (!reader.HasRows) return null;
 
                 User user = new User();
 
@@ -62,7 +98,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                     user.Email = reader.GetString(reader.GetOrdinal("email"));
                 }
 
-                return Results.Ok(user);
+                return user;
             }
         }
 

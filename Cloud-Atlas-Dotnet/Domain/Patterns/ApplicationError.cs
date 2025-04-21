@@ -16,11 +16,13 @@ namespace Cloud_Atlas_Dotnet.Domain.Patterns
     {
         public ErrorType ErrorType;
         public ProblemDetails ProblemDetails;
+        public string ErrorMessage;
 
-        public ApplicationError(ErrorType errorType, IDictionary<string, object?> problemDetailsExtensions)
+        public ApplicationError(ErrorType errorType, IDictionary<string, object?>? problemDetailsExtensions, string errorMessage = "Unknown Error")
         {
             ErrorType = errorType;
             ProblemDetails = new ProblemDetails();
+            ProblemDetails.Detail = errorMessage;
 
             if (problemDetailsExtensions is not null) ProblemDetails.Extensions = problemDetailsExtensions;
 
@@ -64,6 +66,8 @@ namespace Cloud_Atlas_Dotnet.Domain.Patterns
                     ProblemDetails.Status = (int?)HttpStatusCode.InternalServerError;
                     break;
             }
+
+            this.ErrorMessage = errorMessage;
         }
 
 

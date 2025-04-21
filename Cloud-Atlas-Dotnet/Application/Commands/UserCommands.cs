@@ -27,6 +27,18 @@ namespace Cloud_Atlas_Dotnet.Application.Commands
         public Guid UserId { get; set; }
     }
 
+    public class GetUserCommand : IRequest<Result<GetUserCommandResponse>>
+    {
+        public Guid Id { get; set; }
+    }
+
+    public class GetUserCommandResponse {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Username { get; set; }
+        public Guid Id { get; set; }
+    }
+
     public class DeleteUserCommand : IRequest<Result<DeleteUserCommandResponse>>
     {
         public Guid Id { get; set; }

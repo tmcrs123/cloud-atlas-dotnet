@@ -19,6 +19,7 @@ namespace Cloud_Atlas_Dotnet
 
             //register handlers
             builder.Services.AddTransient<IRequestHandler<CreateUserCommand, Result<CreateUserCommandResponse>>, CreateUserHandler>();
+            builder.Services.AddTransient<IRequestHandler<GetUserCommand, Result<GetUserCommandResponse>>, GetUserHandler>();
             builder.Services.AddTransient<IRequestHandler<DeleteUserCommand, Result<DeleteUserCommandResponse>>, DeleteUserHandler>();
             builder.Services.AddTransient<IRequestHandler<UpdateUserCommand, Result<UpdateUserCommandResponse>>, UpdateUserHandler>();
 

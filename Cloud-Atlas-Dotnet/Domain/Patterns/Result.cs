@@ -3,11 +3,14 @@
     public class Result
     {
         public bool IsSuccess { get; set; }
-        public ApplicationError Error { get; set; }
+        public ApplicationError? Error { get; set; }
         public bool isFailure => !IsSuccess;
 
         public Result(bool isSuccess, ApplicationError? error)
         {
+            IsSuccess = isSuccess;
+            Error = error ?? null;
+
             if (isFailure && error is null)
             {
                 throw new InvalidOperationException("Failure must have an error");
@@ -17,9 +20,6 @@
             {
                 throw new InvalidOperationException("Success cannot have an error");
             }
-
-            IsSuccess = isSuccess;
-            Error = error;
         }
 
         public static Result Success()
@@ -37,7 +37,7 @@
     {
         public T Value { get; set; }
 
-        public Result(T value, bool isSuccess, ApplicationError error) : base(isSuccess, error)
+        public Result(T value, bool isSuccess, ApplicationError? error) : base(isSuccess, error)
         {
             Value = value;
         }
@@ -47,9 +47,9 @@
             return new Result<T>(value, true, null);
         }
 
-        public static Result Failure(T value, ApplicationError error)
+        public static new Result<T> Failure(ApplicationError? error)
         {
-            return new Result<T>(default(T), false, error);
+            return new Result<T>(default, false, error);
         }
     }
 }
