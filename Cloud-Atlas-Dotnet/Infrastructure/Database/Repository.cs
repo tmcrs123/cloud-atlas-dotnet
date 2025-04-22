@@ -3,6 +3,7 @@ using Cloud_Atlas_Dotnet.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System.Data;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 
 namespace Cloud_Atlas_Dotnet.Infrastructure.Database
@@ -102,7 +103,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
             }
         }
 
-        public async Task<IResult> UpdateUser(UpdateUserCommand request)
+        public async Task<bool> UpdateUser(string password, Guid id)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
 
@@ -112,18 +113,18 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 var cmd = connection.CreateCommand();
 
-                cmd.CommandText = "UPDATE users set password=@password WHERE ID=@id";
+                cmd.CommandText = "UPDATE users set password=@password WHERE Id=@id";
 
-                cmd.Parameters.AddWithValue("password", request.Password);
-                cmd.Parameters.AddWithValue("id", request.Id);
+                cmd.Parameters.AddWithValue("password", password);
+                cmd.Parameters.AddWithValue("id", id);
 
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
-                return Results.NoContent();
+                return rowsAffected == 1;
             }
         }
 
-        public async Task<IResult> DeleteUser(DeleteUserCommand request)
+        public async Task<bool> DeleteUser(Guid id)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
 
@@ -133,12 +134,13 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 var cmd = connection.CreateCommand();
 
-                cmd.CommandText = "DELETE FROM users WHERE ID=@id";
+                cmd.CommandText = "DELETE FROM users WHERE Id=@id";
 
-                cmd.Parameters.AddWithValue("id", request.Id);
+                cmd.Parameters.AddWithValue("id", id);
 
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
-                return Results.Ok(rowsAffected);
+
+                return rowsAffected == 1;
             }
         }
 

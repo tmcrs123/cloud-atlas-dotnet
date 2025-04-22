@@ -39,14 +39,12 @@ namespace Cloud_Atlas_Dotnet.Application.Commands
         public Guid Id { get; set; }
     }
 
-    public class DeleteUserCommand : IRequest<Result<DeleteUserCommandResponse>>
+    public class DeleteUserCommand : IRequest<Result>
     {
         public Guid Id { get; set; }
     }
 
-    public class DeleteUserCommandResponse { }
-
-    public class UpdateUserCommand : IRequest<Result<UpdateUserCommandResponse>>
+    public class UpdateUserCommand : IRequest<Result>
     {
         public string Password { get; set; }
         public Guid Id { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
 using Cloud_Atlas_Dotnet.Domain.Services;
 using MediatorLibrary;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cloud_Atlas_Dotnet.Controllers
@@ -46,14 +47,32 @@ namespace Cloud_Atlas_Dotnet.Controllers
         [HttpPut]
         public async Task<IResult> UpdateUser(UpdateUserCommand request)
         {
-            throw new NotImplementedException();
+            var response = await _mediator.Send(request);
+
+            if (response.IsSuccess)
+            {
+                return Results.NoContent();
+            }
+            else
+            {
+                return Results.Problem(response.Error!.ProblemDetails); //this is safe, we check for this in Result class ctor
+            }
 
         }
 
         [HttpDelete]
         public async Task<IResult> DeleteUser(DeleteUserCommand request)
         {
-            throw new NotImplementedException();
+            var response = await _mediator.Send(request);
+
+            if (response.IsSuccess)
+            {
+                return Results.NoContent();
+            }
+            else
+            {
+                return Results.Problem(response.Error!.ProblemDetails); //this is safe, we check for this in Result class ctor
+            }
 
         }
     }

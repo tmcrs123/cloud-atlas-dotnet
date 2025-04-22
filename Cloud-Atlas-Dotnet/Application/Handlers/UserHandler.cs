@@ -2,7 +2,6 @@
 using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using MediatorLibrary;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Cloud_Atlas_Dotnet.Application.Handlers
 {
@@ -34,19 +33,53 @@ namespace Cloud_Atlas_Dotnet.Application.Handlers
         }
     }
 
-    public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, Result<UpdateUserCommandResponse>>
+    public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, Result>
     {
-        public async Task<Result<UpdateUserCommandResponse>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public UpdateUserHandler(IServiceScopeFactory serviceScopeFactory)
         {
-            throw new NotImplementedException();
+            _serviceScopeFactory = serviceScopeFactory;
         }
+
+        public async Task<Result> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var updated = await repository.UpdateUser(request.Password, request.Id);
+
+            if (!updated)
+            {
+                return Result.Failure(new ApplicationError(ErrorType.Failure, null, "Failed to update user"));
+            }
+
+            return new Result(true, null);
+        }                        
     }
 
-    public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, Result<DeleteUserCommandResponse>>
+    public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, Result>
     {
-        public async Task<Result<DeleteUserCommandResponse>> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public DeleteUserHandler(IServiceScopeFactory serviceScopeFactory)
         {
-            throw new NotImplementedException();
+            _serviceScopeFactory = serviceScopeFactory;
+        }
+
+        public async Task<Result> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var deleted = await repository.DeleteUser(request.Id);
+
+            if (!deleted)
+            {
+                return Result.Failure(new ApplicationError(ErrorType.Failure, null, "Failed to delete user"));
+            }
+
+            return new Result(true, null);
         }
     }
 

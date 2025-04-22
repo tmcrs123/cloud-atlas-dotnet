@@ -3,14 +3,9 @@ using MediatorLibrary;
 
 namespace Cloud_Atlas_Dotnet.Application.Commands
 {
-    public class VerifyAccountCommand : IRequest<Result<VerifyCommandResponse>>
+    public class VerifyAccountCommand : IRequest<Result>
     {
         public bool IsVerified { get; set; }
         public Guid UserId { get; set; }
-    }
-
-    public class VerifyCommandResponse
-    {
-
     }
 }
