@@ -56,7 +56,8 @@ EXECUTE FUNCTION create_user_account();
 CREATE OR REPLACE PROCEDURE INSERT_IMAGE(
     image_url VARCHAR(200),
     legend VARCHAR(100),
-    id_of_atlas UUID
+    id_of_atlas UUID,
+    OUT affected_rows INT
 ) 
 LANGUAGE plpgsql AS $$
 DECLARE
@@ -75,6 +76,7 @@ BEGIN
         )
     )
     WHERE images.atlas_id = id_of_atlas;
+    GET DIAGNOSTICS affected_rows = ROW_COUNT;
 END;
 $$;
 

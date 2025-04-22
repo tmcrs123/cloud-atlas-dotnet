@@ -11,3 +11,4 @@ redis
 exception handling
 env validation
 a middleware
+redaction on properties (don't return sensitive data)

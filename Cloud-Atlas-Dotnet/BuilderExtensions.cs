@@ -26,9 +26,9 @@ namespace Cloud_Atlas_Dotnet
             builder.Services.AddTransient<IRequestHandler<VerifyAccountCommand, Result>, VerifyAccountHandler>();
 
             builder.Services.AddTransient<IRequestHandler<CreateAtlasCommand, Result<CreateAtlasCommandResponse>>, CreateAtlasHandler>();
-            builder.Services.AddTransient<IRequestHandler<GetAtlasCommand, Result<GetAtlasCommandResponse>>, GetAtlasHandler>();
+            builder.Services.AddTransient<IRequestHandler<GetAtlasForUserCommand, Result<GetAtlasForUserCommandResponse>>, GetAtlasHandler>();
             builder.Services.AddTransient<IRequestHandler<UpdateAtlasCommand, Result<UpdateAtlasCommandResponse>>, UpdateAtlasHandler>();
-            builder.Services.AddTransient<IRequestHandler<DeleteAtlasCommand, Result<DeleteAtlasCommandResponse>>, DeleteAtlasHandler>();
+            builder.Services.AddTransient<IRequestHandler<DeleteAtlasCommand, Result>, DeleteAtlasHandler>();
 
             builder.Services.AddTransient<IRequestHandler<CreateImageCommand, Result<CreateImageCommandResponse>>, CreateImageHandler>();
             builder.Services.AddTransient<IRequestHandler<UpdateImageCommand, Result<UpdateImageCommandResponse>>, UpdateImageHandler>();

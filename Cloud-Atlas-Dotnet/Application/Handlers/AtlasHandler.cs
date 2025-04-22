@@ -1,38 +1,98 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
+using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using MediatorLibrary;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Cloud_Atlas_Dotnet.Application.Handlers
 {
     public class CreateAtlasHandler : IRequestHandler<CreateAtlasCommand, Result<CreateAtlasCommandResponse>>
     {
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public CreateAtlasHandler(IServiceScopeFactory serviceScopeFactory)
+        {
+            _serviceScopeFactory = serviceScopeFactory;
+        }
+
         public async Task<Result<CreateAtlasCommandResponse>> Handle(CreateAtlasCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var newAtlas = await repository.CreateAtlas(request.Title, request.UserId);
+
+            if (newAtlas is null)
+            {
+                return Result<CreateAtlasCommandResponse>.Failure(new ApplicationError(ErrorType.Failure, null, "Failed to create new atlas"));
+            }
+
+            return new Result<CreateAtlasCommandResponse>(new CreateAtlasCommandResponse() { Url = new Uri($"http://localhost:5099/api/atlas/{newAtlas.Id}")}, true, null);
         }
     }
 
     public class UpdateAtlasHandler : IRequestHandler<UpdateAtlasCommand, Result<UpdateAtlasCommandResponse>>
     {
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public UpdateAtlasHandler(IServiceScopeFactory serviceScopeFactory)
+        {
+            _serviceScopeFactory = serviceScopeFactory;
+        }
+
         public async Task<Result<UpdateAtlasCommandResponse>> Handle(UpdateAtlasCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var success = await repository.UpdateAtlas(request.AtlasId, request.Title);
+
+            if (!success)
+            {
+                return Result<UpdateAtlasCommandResponse>.Failure(new ApplicationError(ErrorType.Failure, null, "Failed to update atlas"));
+            }
+
+            return new Result<UpdateAtlasCommandResponse>(new UpdateAtlasCommandResponse() { Url = new Uri($"http://localhost:5099/api/atlas/{request.AtlasId}") }, true, null);
         }
     }
 
-    public class GetAtlasHandler : IRequestHandler<GetAtlasCommand, Result<GetAtlasCommandResponse>>
+    public class GetAtlasHandler : IRequestHandler<GetAtlasForUserCommand, Result<GetAtlasForUserCommandResponse>>
     {
-        public async Task<Result<GetAtlasCommandResponse>> Handle(GetAtlasCommand request, CancellationToken cancellationToken)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public GetAtlasHandler(IServiceScopeFactory serviceScopeFactory)
         {
-            throw new NotImplementedException();
+            _serviceScopeFactory = serviceScopeFactory;
+        }
+
+        public async Task<Result<GetAtlasForUserCommandResponse>> Handle(GetAtlasForUserCommand request, CancellationToken cancellationToken)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var atlasList = await repository.GetAtlasForUser(request.UserId);
+
+            return new Result<GetAtlasForUserCommandResponse>(new GetAtlasForUserCommandResponse() { AtlasList = atlasList}, true, null);
         }
     }
 
-    public class DeleteAtlasHandler : IRequestHandler<DeleteAtlasCommand, Result<DeleteAtlasCommandResponse>>
+    public class DeleteAtlasHandler : IRequestHandler<DeleteAtlasCommand, Result>
     {
-        public async Task<Result<DeleteAtlasCommandResponse>> Handle(DeleteAtlasCommand request, CancellationToken cancellationToken)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public DeleteAtlasHandler(IServiceScopeFactory serviceScopeFactory)
         {
-            throw new NotImplementedException();
+            _serviceScopeFactory = serviceScopeFactory;
+        }
+
+        public async Task<Result> Handle(DeleteAtlasCommand request, CancellationToken cancellationToken)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var atlasList = await repository.DeleteAtlas(request.AtlasId);
+
+            return new Result(true, null);
         }
     }
 }

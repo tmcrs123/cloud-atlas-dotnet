@@ -11,12 +11,13 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
         Task<User> GetUser([FromQuery] Guid id);
         Task<bool> UpdateUser(string password, Guid id);
         Task<bool> DeleteUser(Guid id);
-        Task<IResult> CreateAtlas(CreateAtlasCommand request);
-        Task<IResult> GetAtlasForUser(Guid userId);
-        Task<IResult> UpdateAtlas(UpdateAtlasCommand request);
-        Task<IResult> DeleteAtlas(DeleteAtlasCommand request);
-        Task<IResult> AddImageToAtlas(CreateImageCommand request);
-        Task<IResult> GetImagesForAtlas([FromQuery] GetImagesForAtlasCommand request);
+        Task<bool> VerifyAccount(Guid userId);
+        Task<Atlas> CreateAtlas(string title, Guid userId);
+        Task<bool> UpdateAtlas(Guid atlasId, string title);
+        Task<List<Atlas>> GetAtlasForUser(Guid userId);
+        Task<bool> DeleteAtlas(Guid atlasId);
+        Task<bool> AddImageToAtlas(Guid atlasId, string legend, Uri imageUri);
+        Task<List<Image>> GetImagesForAtlas(Guid atlasId);
         Task<IResult> UpdateImageDetails(UpdateImageCommand request);
         Task<IResult> DeleteImage(DeleteImageCommand request);
 

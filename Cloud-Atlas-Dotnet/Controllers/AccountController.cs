@@ -1,36 +1,30 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
+using MediatorLibrary;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
 
 namespace Cloud_Atlas_Dotnet.Controllers
 {
     public class AccountController : BaseController
     {
-        public string DbConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=postgres;Database=cloud-atlas-dotnet";
+        private readonly IMediator _mediator;
+
+        public AccountController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
         [HttpPost]
         public async Task<IResult> VerifyAccount(VerifyAccountCommand request)
         {
-            if (!request.IsVerified)
+            var response = await _mediator.Send(request);
+
+            if (response.IsSuccess)
             {
-                return Results.Ok();
+                return Results.NoContent();
             }
-
-            var connection = new NpgsqlConnection(DbConnectionString);
-
-            using (connection)
+            else
             {
-                connection.Open();
-
-                var cmd = connection.CreateCommand();
-
-                cmd.CommandText = "update accounts set verified = @verified where user_id=@userid";
-
-                cmd.Parameters.AddWithValue("userid", request.UserId);
-                cmd.Parameters.AddWithValue("verified", request.IsVerified);
-
-                var rowsAffected = await cmd.ExecuteNonQueryAsync();
-                return Results.Ok(rowsAffected);
+                return Results.Problem(response.Error!.ProblemDetails); //this is safe, we check for this in Result class ctor
             }
         }
     }
