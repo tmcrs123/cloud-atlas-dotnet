@@ -1,5 +1,4 @@
-﻿using Cloud_Atlas_Dotnet.Application.Commands;
-using Cloud_Atlas_Dotnet.Domain.Entities;
+﻿using Cloud_Atlas_Dotnet.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cloud_Atlas_Dotnet.Infrastructure.Database
@@ -18,8 +17,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
         Task<bool> DeleteAtlas(Guid atlasId);
         Task<bool> AddImageToAtlas(Guid atlasId, string legend, Uri imageUri);
         Task<List<Image>> GetImagesForAtlas(Guid atlasId);
-        Task<IResult> UpdateImageDetails(UpdateImageCommand request);
-        Task<IResult> DeleteImage(DeleteImageCommand request);
-
+        Task<bool> UpdateImageDetails(Guid atlasId, Guid imageId, string legend);
+        Task<bool> DeleteImage(Guid atlasId, Guid imageId);
     }
 }

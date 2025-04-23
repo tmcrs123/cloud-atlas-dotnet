@@ -46,19 +46,43 @@ namespace Cloud_Atlas_Dotnet.Application.Handlers
         }
     }
 
-    public class UpdateImageHandler : IRequestHandler<UpdateImageCommand, Result<UpdateImageCommandResponse>>
+    public class UpdateImageHandler : IRequestHandler<UpdateImageCommand, Result>
     {
-        public Task<Result<UpdateImageCommandResponse>> Handle(UpdateImageCommand request, CancellationToken cancellationToken)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public UpdateImageHandler(IServiceScopeFactory serviceScopeFactory)
         {
-            throw new NotImplementedException();
+            _serviceScopeFactory = serviceScopeFactory;
+        }
+
+        public async Task<Result> Handle(UpdateImageCommand request, CancellationToken cancellationToken)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var images = await repository.UpdateImageDetails(request.AtlasId, request.ImageId, request.Legend);
+
+            return new Result(true, null);
         }
     }
 
-    public class DeleteImageHandler : IRequestHandler<DeleteImageCommand, Result<DeleteImageCommandResponse>>
+    public class DeleteImageHandler : IRequestHandler<DeleteImageCommand, Result>
     {
-        public Task<Result<DeleteImageCommandResponse>> Handle(DeleteImageCommand request, CancellationToken cancellationToken)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public DeleteImageHandler(IServiceScopeFactory serviceScopeFactory)
         {
-            throw new NotImplementedException();
+            _serviceScopeFactory = serviceScopeFactory;
+        }
+
+        public async Task<Result> Handle(DeleteImageCommand request, CancellationToken cancellationToken)
+        {
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var images = await repository.DeleteImage(request.AtlasId, request.ImageId);
+
+            return new Result(true, null);
         }
     }
 }

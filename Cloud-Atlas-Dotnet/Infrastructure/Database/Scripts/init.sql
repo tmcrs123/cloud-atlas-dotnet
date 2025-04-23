@@ -83,7 +83,8 @@ $$;
 CREATE OR REPLACE PROCEDURE UPDATE_IMAGE(
     image_id TEXT,
     id_of_atlas UUID,
-    legend VARCHAR(200)
+    legend VARCHAR(200),
+    OUT affected_rows INT
 )
 LANGUAGE plpgsql 
 AS $$ 
@@ -101,13 +102,15 @@ BEGIN
         FROM jsonb_array_elements(image_details) AS elem
     )
     WHERE atlas_id = id_of_atlas;
+    GET DIAGNOSTICS affected_rows = ROW_COUNT;
 END; 
 $$;
 
 -- delete an image
 CREATE OR REPLACE PROCEDURE DELETE_IMAGE(
     image_id TEXT,
-    id_of_atlas UUID
+    id_of_atlas UUID,
+    OUT affected_rows INT
 )
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -118,5 +121,6 @@ BEGIN
 		where elem ->> 'imageId' <> image_id
 	)
 	WHERE atlas_id = id_of_atlas;
+    GET DIAGNOSTICS affected_rows = ROW_COUNT;
 END
 $$

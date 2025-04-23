@@ -66,7 +66,7 @@ namespace Cloud_Atlas_Dotnet.Controllers
 
             if (response.IsSuccess)
             {
-                return Results.Created();
+                return Results.Ok();
             }
             else
             {

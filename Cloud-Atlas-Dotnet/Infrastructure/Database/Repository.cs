@@ -335,7 +335,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
             }
         }
 
-        public async Task<IResult> UpdateImageDetails(UpdateImageCommand request)
+        public async Task<bool> UpdateImageDetails(Guid atlasId, Guid imageId, string legend)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
 
@@ -348,17 +348,27 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                 cmd.CommandText = "UPDATE_IMAGE";
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("legend", request.Legend);
-                cmd.Parameters.AddWithValue("id_of_atlas", request.AtlasId);
-                cmd.Parameters.AddWithValue("image_id", request.ImageId.ToString());
+                cmd.Parameters.AddWithValue("id_of_atlas", atlasId);
+                cmd.Parameters.AddWithValue("image_id", imageId.ToString());
+                cmd.Parameters.AddWithValue("legend", legend);
 
-                var rowsAffected = await cmd.ExecuteNonQueryAsync();
+                var affectedRowsParam = new NpgsqlParameter("affected_rows", DbType.Int32)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                cmd.Parameters.Add(affectedRowsParam);
 
-                return Results.Ok(rowsAffected);
+                await cmd.ExecuteNonQueryAsync();
+
+                if (affectedRowsParam.Value is null) return false;
+
+                int affectedRows = (int)affectedRowsParam.Value;
+
+                return affectedRows == 1;
             }
         }
 
-        public async Task<IResult> DeleteImage(DeleteImageCommand request)
+        public async Task<bool> DeleteImage(Guid atlasId, Guid imageId)
         {
             var connection = new NpgsqlConnection(DbConnectionString);
 
@@ -371,13 +381,28 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                 cmd.CommandText = "DELETE_IMAGE";
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("id_of_atlas", request.AtlasId);
-                cmd.Parameters.AddWithValue("image_id", request.ImageId.ToString());
+                cmd.Parameters.AddWithValue("id_of_atlas", atlasId);
+                cmd.Parameters.AddWithValue("image_id", imageId.ToString());
 
-                var rowsAffected = await cmd.ExecuteNonQueryAsync();
+                var affectedRowsParam = new NpgsqlParameter("affected_rows", DbType.Int32)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                cmd.Parameters.Add(affectedRowsParam);
 
-                return Results.Ok(rowsAffected);
+                await cmd.ExecuteNonQueryAsync();
+
+                if (affectedRowsParam.Value is null) return false;
+
+                int affectedRows = (int)affectedRowsParam.Value;
+
+                return affectedRows == 1;
             }
         }
     }
 }
+
+
+//24th 3:30 - 5
+
+

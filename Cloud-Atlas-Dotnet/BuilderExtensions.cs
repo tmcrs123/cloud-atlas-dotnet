@@ -31,9 +31,9 @@ namespace Cloud_Atlas_Dotnet
             builder.Services.AddTransient<IRequestHandler<DeleteAtlasCommand, Result>, DeleteAtlasHandler>();
 
             builder.Services.AddTransient<IRequestHandler<CreateImageCommand, Result<CreateImageCommandResponse>>, CreateImageHandler>();
-            builder.Services.AddTransient<IRequestHandler<UpdateImageCommand, Result<UpdateImageCommandResponse>>, UpdateImageHandler>();
+            builder.Services.AddTransient<IRequestHandler<UpdateImageCommand, Result>, UpdateImageHandler>();
             builder.Services.AddTransient<IRequestHandler<GetImagesForAtlasCommand, Result<GetImagesForAtlasCommandResponse>>, GetImagesForAtlasHandler>();
-            builder.Services.AddTransient<IRequestHandler<DeleteImageCommand, Result<DeleteImageCommandResponse>>, DeleteImageHandler>();
+            builder.Services.AddTransient<IRequestHandler<DeleteImageCommand, Result>, DeleteImageHandler>();
         }
 
         public static void ConfigureInfrastructure(this WebApplicationBuilder builder)
