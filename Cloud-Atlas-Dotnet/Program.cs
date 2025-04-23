@@ -1,5 +1,7 @@
 
 using MediatorLibrary;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 
 namespace Cloud_Atlas_Dotnet
 {
@@ -12,6 +14,19 @@ namespace Cloud_Atlas_Dotnet
             builder.ConfigureMediator();
             builder.ConfigureInfrastructure();
             builder.ConfigureValidations();
+
+            //response compression
+            builder.Services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes;
+            });
+
+            builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.SmallestSize;
+            });
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -26,10 +41,10 @@ namespace Cloud_Atlas_Dotnet
                 app.MapOpenApi();
             }
 
+            app.UseResponseCompression();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

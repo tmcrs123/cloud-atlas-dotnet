@@ -20,9 +20,9 @@ namespace Cloud_Atlas_Dotnet.Application.Filters
 
         void IActionFilter.OnActionExecuting(ActionExecutingContext context)
         {
-            var boundRequestModel = context.ActionArguments["request"];
+             var success = context.ActionArguments.TryGetValue("request", out var boundRequestModel);
 
-            if (boundRequestModel is null) return;
+            if (boundRequestModel is null || !success) return;
 
             Type t = boundRequestModel.GetType();
 
