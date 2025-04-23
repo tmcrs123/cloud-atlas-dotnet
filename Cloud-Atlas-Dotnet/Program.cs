@@ -1,6 +1,6 @@
 
-using MediatorLibrary;
 using Microsoft.AspNetCore.ResponseCompression;
+using Scalar.AspNetCore;
 using System.IO.Compression;
 
 namespace Cloud_Atlas_Dotnet
@@ -39,6 +39,7 @@ namespace Cloud_Atlas_Dotnet
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.MapScalarApiReference(); //localhost:5099/scalar
             }
 
             app.UseResponseCompression();

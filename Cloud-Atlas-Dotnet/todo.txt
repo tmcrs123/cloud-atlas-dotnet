@@ -1,12 +1,12 @@
 ProblemDetails/CustomProblem details
 documentation
-response compression
 serilog / logging
 scalar
 jwt tokens
 authentication
 authorization
 tests
+proper api responses and codes
 redis
 exception handling
 env validation
