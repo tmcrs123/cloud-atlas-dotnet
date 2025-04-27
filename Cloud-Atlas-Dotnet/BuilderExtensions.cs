@@ -1,12 +1,16 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
 using Cloud_Atlas_Dotnet.Application.Filters;
 using Cloud_Atlas_Dotnet.Application.Handlers;
+using Cloud_Atlas_Dotnet.Application.Logging;
+using Cloud_Atlas_Dotnet.Application.Middleware;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Domain.Services;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
-using Cloud_Atlas_Dotnet.Libraries;
 using Cloud_Atlas_Dotnet.Libraries.FluentValidation.Interfaces;
 using MediatorLibrary;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging.Console;
 
 namespace Cloud_Atlas_Dotnet
 {
@@ -44,10 +48,27 @@ namespace Cloud_Atlas_Dotnet
         public static void ConfigureValidations(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IValidationService, ValidationService>();
-            //builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
             builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
 
             builder.Services.AddScoped<ValidationFilter>();
+            builder.Services.AddScoped<RequestBodyRedactionFilter>();
+        }
+
+        public static void ConfigureLogging(this WebApplicationBuilder builder)
+        {
+            builder.Logging.ClearProviders();
+
+            builder.Logging.AddFilter("Microsoft", LogLevel.None);
+            builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.None);
+            builder.Logging.AddFilter("System", LogLevel.None);
+
+            builder.Logging.AddConsole(options =>
+            {
+                options.FormatterName = "CustomConsoleFormatter";
+            }).AddConsoleFormatter<CustomConsoleFormatter, ConsoleFormatterOptions>(options =>
+            {
+                options.IncludeScopes = true;
+            });
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Cloud_Atlas_Dotnet.Domain.Patterns;
+﻿using Cloud_Atlas_Dotnet.Domain.Attributes;
+using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Libraries.FluentValidation;
 using MediatorLibrary;
 
@@ -6,9 +7,12 @@ namespace Cloud_Atlas_Dotnet.Application.Commands
 {
     public class CreateUserCommand : IRequest<Result<CreateUserCommandResponse>>
     {
+        [SensitiveData]
         public string Name { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
+
+        [SensitiveData]
         public string Password { get; set; }
     }
 

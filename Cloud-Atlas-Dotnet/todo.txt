@@ -1,7 +1,6 @@
 ProblemDetails/CustomProblem details
 documentation
 serilog / logging
-scalar
 jwt tokens
 authentication
 authorization

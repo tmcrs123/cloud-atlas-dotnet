@@ -1,4 +1,5 @@
 
+using Cloud_Atlas_Dotnet.Application.Middleware;
 using Microsoft.AspNetCore.ResponseCompression;
 using Scalar.AspNetCore;
 using System.IO.Compression;
@@ -11,6 +12,7 @@ namespace Cloud_Atlas_Dotnet
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.ConfigureLogging();
             builder.ConfigureMediator();
             builder.ConfigureInfrastructure();
             builder.ConfigureValidations();
@@ -30,6 +32,7 @@ namespace Cloud_Atlas_Dotnet
 
             // Add services to the container.
             builder.Services.AddControllers();
+            builder.Services.AddHttpContextAccessor();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -43,6 +46,8 @@ namespace Cloud_Atlas_Dotnet
             }
 
             app.UseResponseCompression();
+            app.UseMiddleware<CorrelationIdMiddleware>();
+            app.UseMiddleware<RequestLoggerMiddleware>();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
