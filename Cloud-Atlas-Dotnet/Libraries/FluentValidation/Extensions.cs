@@ -3,7 +3,6 @@ namespace Cloud_Atlas_Dotnet.Libraries.FluentValidation
 {
     public static class PropertyRuleBuilderGenericExtensions
     {
-
         private static void AddFailureToList<T, TProperty>(PropertyRuleBuilder<T, TProperty> propertyRuleBuilder, ValidationFailure failure)
         {
             if (propertyRuleBuilder.Failures.ContainsKey(propertyRuleBuilder._propertyName))
@@ -28,6 +27,25 @@ namespace Cloud_Atlas_Dotnet.Libraries.FluentValidation
                 if (propertyValue == null)
                 {
                     ValidationFailure failure = new ValidationFailure(propertyRuleBuilder._propertyName, $"Null value not allowed for property {propertyRuleBuilder._propertyName}", null);
+
+                    AddFailureToList(propertyRuleBuilder, failure);
+
+                    return false;
+                }
+
+                return true;
+            });
+
+            return propertyRuleBuilder;
+        }
+
+        public static PropertyRuleBuilder<T,string> NotEmpty<T>(this PropertyRuleBuilder<T, string> propertyRuleBuilder)
+        {
+            propertyRuleBuilder.validationFns.Add(propertyValue =>
+            {
+                if (propertyValue == string.Empty)
+                {
+                    ValidationFailure failure = new ValidationFailure(propertyRuleBuilder._propertyName, $"Empty string not allowed for property {propertyRuleBuilder._propertyName}", null);
 
                     AddFailureToList(propertyRuleBuilder, failure);
 

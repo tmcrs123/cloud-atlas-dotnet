@@ -1,4 +1,5 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
+using Cloud_Atlas_Dotnet.Application.Configuration;
 using Cloud_Atlas_Dotnet.Application.Filters;
 using Cloud_Atlas_Dotnet.Application.Handlers;
 using Cloud_Atlas_Dotnet.Application.Logging;
@@ -11,6 +12,7 @@ using MediatorLibrary;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Options;
 
 namespace Cloud_Atlas_Dotnet
 {
@@ -48,6 +50,11 @@ namespace Cloud_Atlas_Dotnet
         public static void ConfigureValidations(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IValidationService, ValidationService>();
+
+            // Bind & Validate AppSettings
+            builder.Services.AddOptions<AppSettings>().BindConfiguration("AppSettings").ValidateOnStart();
+            builder.Services.AddSingleton<IValidateOptions<AppSettings>>(s => new AppSettingsValidator());
+            
             builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
 
             builder.Services.AddScoped<ValidationFilter>();
