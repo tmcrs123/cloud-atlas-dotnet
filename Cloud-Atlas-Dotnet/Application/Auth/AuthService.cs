@@ -1,4 +1,5 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Configuration;
+using Cloud_Atlas_Dotnet.Domain;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,7 +28,8 @@ namespace Cloud_Atlas_Dotnet.Application.Auth
             {
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Email, email),
-                new Claim(JwtRegisteredClaimNames.Sid, id),
+                new Claim(ClaimTypes.PrimarySid, id),
+                new Claim(ClaimTypes.Role, Roles.Owner.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.JwtSecretKey));
@@ -35,7 +37,7 @@ namespace Cloud_Atlas_Dotnet.Application.Auth
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.Now.AddMinutes(1),
                 signingCredentials: creds
             );
 

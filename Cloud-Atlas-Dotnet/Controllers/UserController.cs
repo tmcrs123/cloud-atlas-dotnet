@@ -1,7 +1,5 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
-using Cloud_Atlas_Dotnet.Domain.Services;
 using MediatorLibrary;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cloud_Atlas_Dotnet.Controllers
@@ -16,7 +14,7 @@ namespace Cloud_Atlas_Dotnet.Controllers
         }
 
         [HttpPost]
-        [Route("/sign-up")]
+        [Route("sign-up")]
         public async Task<IResult> CreateUser(CreateUserCommand request)
         {
             var response = await _mediator.Send(request);
@@ -24,7 +22,8 @@ namespace Cloud_Atlas_Dotnet.Controllers
             if (response.IsSuccess)
             {
                 return Results.Created();
-            } else
+            }
+            else
             {
                 return Results.Problem(response.Error!.ProblemDetails); //this is safe, we check for this in Result class ctor
             }
@@ -77,16 +76,17 @@ namespace Cloud_Atlas_Dotnet.Controllers
         }
 
         [HttpPost]
-        [Route("/sign-in")]
+        [Route("sign-in")]
         public async Task<IResult> SignInUser(SignInUserCommand request)
         {
             var response = await _mediator.Send(request);
 
             if (response.IsSuccess)
             {
-                HttpContext.Response.Cookies.Append("AuthToken", response.Value.JwtToken, new CookieOptions() { HttpOnly = true});
+                HttpContext.Response.Cookies.Append("AuthToken", response.Value.JwtToken, new CookieOptions() { HttpOnly = true });
                 return Results.NoContent();
-            } else
+            }
+            else
             {
                 return Results.Problem(response.Error!.ProblemDetails);
             }

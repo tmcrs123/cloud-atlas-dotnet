@@ -53,6 +53,7 @@ namespace Cloud_Atlas_Dotnet
             app.UseMiddleware<RequestLoggerMiddleware>();
             app.UseHttpsRedirection();
 
+            app.UseAuthentication(); //this is what set the user in the http context
             app.UseAuthorization();
 
             app.MapControllers();

@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Cloud_Atlas_Dotnet.Application.Filters
 {
-    public class ValidationFilter : IActionFilter
+    public class RequestBodyValidationFilter : IActionFilter
     {
         private readonly IValidationService ValidationService;
-        public ValidationFilter(IValidationService validationService, IServiceProvider serviceProvider)
+        public RequestBodyValidationFilter(IValidationService validationService, IServiceProvider serviceProvider)
         {
             ValidationService = validationService;
         }

@@ -10,9 +10,12 @@ using Cloud_Atlas_Dotnet.Domain.Services;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using Cloud_Atlas_Dotnet.Libraries.FluentValidation.Interfaces;
 using MediatorLibrary;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Cloud_Atlas_Dotnet
 {
@@ -58,7 +61,7 @@ namespace Cloud_Atlas_Dotnet
             
             builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
 
-            builder.Services.AddScoped<ValidationFilter>();
+            builder.Services.AddScoped<RequestBodyValidationFilter>();
             builder.Services.AddScoped<RequestBodyRedactionFilter>();
         }
 
@@ -91,6 +94,35 @@ namespace Cloud_Atlas_Dotnet
             builder.Services.AddSingleton<IPasswordHasher<string>, PasswordHasher<string>>();
 
             builder.Services.AddSingleton<IAuthService, AuthService>();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var token = context.Request.Cookies["AuthToken"];
+                        if (!string.IsNullOrEmpty(token))
+                        {
+                            context.Token = token;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
+
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:JwtSecretKey"])),
+                    ClockSkew = TimeSpan.Zero                    
+                };
+            });
         }
     }
 }

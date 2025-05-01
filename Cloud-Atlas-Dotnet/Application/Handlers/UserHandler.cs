@@ -3,7 +3,6 @@ using Cloud_Atlas_Dotnet.Application.Commands;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using MediatorLibrary;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Cloud_Atlas_Dotnet.Application.Handlers
 {

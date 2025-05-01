@@ -1,8 +1,6 @@
 ProblemDetails/CustomProblem details
 documentation
-serilog / logging
-jwt tokens
-authentication
+serilog
 authorization
 tests
 proper api responses and codes

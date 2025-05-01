@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Cloud_Atlas_Dotnet.Controllers
 {
     [ApiController]
-    [ServiceFilter<ValidationFilter>]
+    [ServiceFilter<RequestBodyValidationFilter>]
     [ServiceFilter<RequestBodyRedactionFilter>]
     [Route("api/[controller]")]
     [Produces("application/json")]
