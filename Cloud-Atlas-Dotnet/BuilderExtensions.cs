@@ -88,6 +88,11 @@ namespace Cloud_Atlas_Dotnet
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         }
 
+        public static void ConfigureHttpClient(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddHttpClient();
+        }
+
         public static void ConfigureAuthentication(this WebApplicationBuilder builder)
         {
             builder.Services.AddSingleton<IPasswordService, PasswordService>();

@@ -18,6 +18,7 @@ namespace Cloud_Atlas_Dotnet
             builder.ConfigureInfrastructure();
             builder.ConfigureValidations();
             builder.ConfigureAuthentication();
+            builder.ConfigureHttpClient();
 
             //response compression
             builder.Services.AddResponseCompression(options =>

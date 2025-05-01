@@ -14,8 +14,12 @@ WITH user_ids AS (
 -- ACCOUNTS IS SEEDED VIA TRIGGER
 
 -- ATLAS
-INSERT INTO ATLAS (TITLE)
-SELECT 'Atlas #' || i
+INSERT INTO ATLAS (TITLE, COORDINATES)
+SELECT 'Atlas #' || i,
+POINT(
+    (random() * 360 - 180)::NUMERIC,  -- Longitude
+    (random() * 180 - 90)::NUMERIC   -- Latitude
+)
 FROM generate_series(1, 10) AS s(i);
 
 -- Get 10 atlas IDs for linking to owners and markers

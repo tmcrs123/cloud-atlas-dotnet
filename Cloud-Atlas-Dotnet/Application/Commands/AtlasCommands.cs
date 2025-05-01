@@ -38,4 +38,9 @@ namespace Cloud_Atlas_Dotnet.Application.Commands
     {
         public Guid AtlasId { get; set; }
     }
+
+    public class GeocodeAtlasCommand : IRequest<Result>
+    {
+        public Guid AtlasId { get; set; }
+    }
 }
