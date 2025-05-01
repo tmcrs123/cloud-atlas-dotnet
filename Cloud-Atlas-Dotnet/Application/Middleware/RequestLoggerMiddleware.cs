@@ -1,16 +1,8 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices.JavaScript;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using Cloud_Atlas_Dotnet.Application.Logging;
+using System.Diagnostics;
 
 namespace Cloud_Atlas_Dotnet.Application.Middleware
 {
-
-    public class CustomRequestScope() {
-        public string CorrelationId { get; set; }
-        public string Endpoint { get; set; }
-    }
 
     public class RequestLoggerMiddleware
     {

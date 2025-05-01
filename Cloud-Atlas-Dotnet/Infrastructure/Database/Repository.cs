@@ -47,6 +47,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> UsernameExists(string username)
         {
+            throw new Exception("User cannot be created exception");
             var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
 
             using (connection)

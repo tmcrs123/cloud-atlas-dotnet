@@ -1,5 +1,4 @@
-﻿using Cloud_Atlas_Dotnet.Application.Middleware;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
 
 namespace Cloud_Atlas_Dotnet.Application.Logging
@@ -30,9 +29,11 @@ namespace Cloud_Atlas_Dotnet.Application.Logging
 
             if (exception != null)
             {
+                textWriter.WriteLine($"CorrelationId: {correlationId}");
                 textWriter.WriteLine($"Exception: {exception.Message}");
                 textWriter.WriteLine($"Stack Trace: {exception.StackTrace}");
-            } else
+            }
+            else
             {
                 textWriter.WriteLine($"{correlationId}: {message}");
             }

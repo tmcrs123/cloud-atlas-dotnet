@@ -7,5 +7,3 @@ authorization
 tests
 proper api responses and codes
 redis
-exception handling
-a middleware

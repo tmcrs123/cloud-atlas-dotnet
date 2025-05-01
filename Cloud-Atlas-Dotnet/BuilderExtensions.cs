@@ -1,16 +1,14 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
 using Cloud_Atlas_Dotnet.Application.Configuration;
+using Cloud_Atlas_Dotnet.Application.Exceptions;
 using Cloud_Atlas_Dotnet.Application.Filters;
 using Cloud_Atlas_Dotnet.Application.Handlers;
 using Cloud_Atlas_Dotnet.Application.Logging;
-using Cloud_Atlas_Dotnet.Application.Middleware;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Domain.Services;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using Cloud_Atlas_Dotnet.Libraries.FluentValidation.Interfaces;
 using MediatorLibrary;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 
@@ -76,6 +74,12 @@ namespace Cloud_Atlas_Dotnet
             {
                 options.IncludeScopes = true;
             });
+        }
+
+        public static void ConfigureGlobalErrorHandling(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddProblemDetails();
+            builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         }
     }
 }

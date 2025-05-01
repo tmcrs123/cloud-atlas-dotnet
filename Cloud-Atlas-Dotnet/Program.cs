@@ -12,6 +12,7 @@ namespace Cloud_Atlas_Dotnet
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.ConfigureGlobalErrorHandling();
             builder.ConfigureLogging();
             builder.ConfigureMediator();
             builder.ConfigureInfrastructure();
@@ -46,6 +47,7 @@ namespace Cloud_Atlas_Dotnet
             }
 
             app.UseResponseCompression();
+            app.UseExceptionHandler();
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<RequestLoggerMiddleware>();
             app.UseHttpsRedirection();
