@@ -55,4 +55,26 @@ namespace Cloud_Atlas_Dotnet.Application.Commands
     }
 
     public class UpdateUserCommandResponse { };
+
+    public class SignInUserCommand : IRequest<Result<SignInUserResponse>>
+    {
+        public string Username { get; set; }
+
+        [SensitiveData]
+        public string Password { get; set; }
+    }
+
+    public class SignInUserResponse
+    {
+        public string JwtToken { get; set; }
+    }
+
+    public class SignInUserCommandValidator : FluentValidator<SignInUserCommand>
+    {
+        public SignInUserCommandValidator()
+        {
+            RuleFor(x => x.Password).NotNull().DifferentFrom("aa");
+            RuleFor(x => x.Username).NotNull();
+        }
+    }
 }

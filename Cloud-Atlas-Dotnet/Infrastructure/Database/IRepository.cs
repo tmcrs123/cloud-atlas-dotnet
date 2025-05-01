@@ -10,6 +10,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
         Task<User> GetUser([FromQuery] Guid id);
         Task<bool> UpdateUser(string password, Guid id);
         Task<bool> DeleteUser(Guid id);
+        Task<User> GetUserByUsername(string username);
         Task<bool> VerifyAccount(Guid userId);
         Task<Atlas> CreateAtlas(string title, Guid userId);
         Task<bool> UpdateAtlas(Guid atlasId, string title);

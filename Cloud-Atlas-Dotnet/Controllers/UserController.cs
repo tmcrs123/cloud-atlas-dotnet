@@ -16,6 +16,7 @@ namespace Cloud_Atlas_Dotnet.Controllers
         }
 
         [HttpPost]
+        [Route("/sign-up")]
         public async Task<IResult> CreateUser(CreateUserCommand request)
         {
             var response = await _mediator.Send(request);
@@ -72,6 +73,22 @@ namespace Cloud_Atlas_Dotnet.Controllers
             else
             {
                 return Results.Problem(response.Error!.ProblemDetails); //this is safe, we check for this in Result class ctor
+            }
+        }
+
+        [HttpPost]
+        [Route("/sign-in")]
+        public async Task<IResult> SignInUser(SignInUserCommand request)
+        {
+            var response = await _mediator.Send(request);
+
+            if (response.IsSuccess)
+            {
+                HttpContext.Response.Cookies.Append("AuthToken", response.Value.JwtToken, new CookieOptions() { HttpOnly = true});
+                return Results.NoContent();
+            } else
+            {
+                return Results.Problem(response.Error!.ProblemDetails);
             }
 
         }

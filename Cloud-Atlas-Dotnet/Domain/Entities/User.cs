@@ -12,5 +12,8 @@ namespace Cloud_Atlas_Dotnet.Domain.Entities
         public string Username { get; set; }
         
         public string Email { get; set; }
+        
+        [SensitiveData]
+        public string Password { get; set; }
     }
 }

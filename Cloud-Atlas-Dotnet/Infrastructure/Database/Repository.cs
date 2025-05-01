@@ -47,7 +47,6 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> UsernameExists(string username)
         {
-            throw new Exception("User cannot be created exception");
             var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
 
             using (connection)
@@ -101,6 +100,37 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                     user.Name = reader.GetString(reader.GetOrdinal("name"));
                     user.Username = reader.GetString(reader.GetOrdinal("username"));
                     user.Email = reader.GetString(reader.GetOrdinal("email"));
+                }
+
+                return user;
+            }
+        }
+
+        public async Task<User> GetUserByUsername(string username)
+        {
+            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
+
+            using (connection)
+            {
+                connection.Open();
+
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "select id, name, username, email, password from users where username = @username";
+
+                cmd.Parameters.AddWithValue("username", username);
+
+                var reader = await cmd.ExecuteReaderAsync();
+
+                User user = new User();
+
+                while (await reader.ReadAsync())
+                {
+                    user.Id = reader.GetGuid(reader.GetOrdinal("id"));
+                    user.Name = reader.GetString(reader.GetOrdinal("name"));
+                    user.Username = reader.GetString(reader.GetOrdinal("username"));
+                    user.Email = reader.GetString(reader.GetOrdinal("email"));
+                    user.Password = reader.GetString(reader.GetOrdinal("password"));
                 }
 
                 return user;

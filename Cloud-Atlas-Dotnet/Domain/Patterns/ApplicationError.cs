@@ -69,20 +69,5 @@ namespace Cloud_Atlas_Dotnet.Domain.Patterns
 
             this.ErrorMessage = errorMessage;
         }
-
-
-        // needs to be serializable
-        public ProblemDetails test()
-        {
-            return new ProblemDetails()
-            {
-                Detail = "what is this aboout",
-                Extensions = null, //this is the list of errors
-                Instance = "dafuq",
-                Status = 400,
-                Title = "some title",
-                Type = "this is the url"
-            };
-        }
     }
 }

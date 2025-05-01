@@ -1,4 +1,5 @@
-﻿using Cloud_Atlas_Dotnet.Application.Commands;
+﻿using Cloud_Atlas_Dotnet.Application.Auth;
+using Cloud_Atlas_Dotnet.Application.Commands;
 using Cloud_Atlas_Dotnet.Application.Configuration;
 using Cloud_Atlas_Dotnet.Application.Exceptions;
 using Cloud_Atlas_Dotnet.Application.Filters;
@@ -9,6 +10,7 @@ using Cloud_Atlas_Dotnet.Domain.Services;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using Cloud_Atlas_Dotnet.Libraries.FluentValidation.Interfaces;
 using MediatorLibrary;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 
@@ -26,6 +28,7 @@ namespace Cloud_Atlas_Dotnet
             builder.Services.AddTransient<IRequestHandler<GetUserCommand, Result<GetUserCommandResponse>>, GetUserHandler>();
             builder.Services.AddTransient<IRequestHandler<DeleteUserCommand, Result>, DeleteUserHandler>();
             builder.Services.AddTransient<IRequestHandler<UpdateUserCommand, Result>, UpdateUserHandler>();
+            builder.Services.AddTransient<IRequestHandler<SignInUserCommand, Result<SignInUserResponse>>, SignInUserHandler>();
 
             builder.Services.AddTransient<IRequestHandler<VerifyAccountCommand, Result>, VerifyAccountHandler>();
 
@@ -80,6 +83,14 @@ namespace Cloud_Atlas_Dotnet
         {
             builder.Services.AddProblemDetails();
             builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        }
+
+        public static void ConfigureAuthentication(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<IPasswordService, PasswordService>();
+            builder.Services.AddSingleton<IPasswordHasher<string>, PasswordHasher<string>>();
+
+            builder.Services.AddSingleton<IAuthService, AuthService>();
         }
     }
 }

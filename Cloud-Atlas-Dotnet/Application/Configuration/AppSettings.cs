@@ -6,6 +6,7 @@ namespace Cloud_Atlas_Dotnet.Application.Configuration
     public class AppSettings
     {
         public string DbConnectionString { get; set; }
+        public string JwtSecretKey { get; set; }
     }
 
     public class AppSettingsValidator : FluentValidator<AppSettings>, IValidateOptions<AppSettings>
@@ -13,6 +14,7 @@ namespace Cloud_Atlas_Dotnet.Application.Configuration
         public AppSettingsValidator()
         {
             RuleFor(x => x.DbConnectionString).NotNull().NotEmpty();
+            RuleFor(x => x.JwtSecretKey).NotNull().NotEmpty();
         }
 
         ValidateOptionsResult IValidateOptions<AppSettings>.Validate(string? name, AppSettings options)

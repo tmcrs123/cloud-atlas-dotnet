@@ -17,6 +17,7 @@ namespace Cloud_Atlas_Dotnet
             builder.ConfigureMediator();
             builder.ConfigureInfrastructure();
             builder.ConfigureValidations();
+            builder.ConfigureAuthentication();
 
             //response compression
             builder.Services.AddResponseCompression(options =>
