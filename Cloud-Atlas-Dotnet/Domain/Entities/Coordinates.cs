@@ -6,11 +6,19 @@
         public double Lng { get; set; }
         public Coordinates(double lat, double lng)
         {
-            if (lat < -90d || lat > 90d) throw new InvalidOperationException("Latitude out of bounds");
-            if (lng < -180d || lng > 180d) throw new InvalidOperationException("Longitude out of bounds");
+            if(!CoordinatesWithinBoundaries(lat, lng))
+            {
+                throw new InvalidOperationException($"Tried to create coordinates with invalid boundaries: Lat: {lat}; Lng: {lng}");
+            }
 
             Lat = lat;
             Lng = lng;
+        }
+
+        public static bool CoordinatesWithinBoundaries(double lat, double lng)
+        {
+            if (lat < -90d || lat > 90d || lng < -180d || lng > 180d) return false;
+            return true;
         }
     }
 }

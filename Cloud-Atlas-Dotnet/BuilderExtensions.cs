@@ -5,6 +5,7 @@ using Cloud_Atlas_Dotnet.Application.Exceptions;
 using Cloud_Atlas_Dotnet.Application.Filters;
 using Cloud_Atlas_Dotnet.Application.Handlers;
 using Cloud_Atlas_Dotnet.Application.Logging;
+using Cloud_Atlas_Dotnet.Application.Services;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Domain.Services;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
@@ -39,6 +40,7 @@ namespace Cloud_Atlas_Dotnet
             builder.Services.AddTransient<IRequestHandler<GetAtlasForUserCommand, Result<GetAtlasForUserCommandResponse>>, GetAtlasHandler>();
             builder.Services.AddTransient<IRequestHandler<UpdateAtlasCommand, Result<UpdateAtlasCommandResponse>>, UpdateAtlasHandler>();
             builder.Services.AddTransient<IRequestHandler<DeleteAtlasCommand, Result>, DeleteAtlasHandler>();
+            builder.Services.AddTransient<IRequestHandler<GeocodeAtlasCommand, Result>, GeocodeAtlasHandler>();
 
             builder.Services.AddTransient<IRequestHandler<CreateImageCommand, Result<CreateImageCommandResponse>>, CreateImageHandler>();
             builder.Services.AddTransient<IRequestHandler<UpdateImageCommand, Result>, UpdateImageHandler>();
@@ -91,6 +93,11 @@ namespace Cloud_Atlas_Dotnet
         public static void ConfigureHttpClient(this WebApplicationBuilder builder)
         {
             builder.Services.AddHttpClient();
+        }
+
+        public static void ConfigureServices(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<IGeocodingService, GeocodingService>();
         }
 
         public static void ConfigureAuthentication(this WebApplicationBuilder builder)

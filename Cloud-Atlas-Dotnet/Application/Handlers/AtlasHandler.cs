@@ -1,4 +1,6 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
+using Cloud_Atlas_Dotnet.Application.Services;
+using Cloud_Atlas_Dotnet.Domain.Entities;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using MediatorLibrary;
@@ -27,7 +29,7 @@ namespace Cloud_Atlas_Dotnet.Application.Handlers
                 return Result<CreateAtlasCommandResponse>.Failure(new ApplicationError(ErrorType.Failure, null, "Failed to create new atlas"));
             }
 
-            return new Result<CreateAtlasCommandResponse>(new CreateAtlasCommandResponse() { Url = new Uri($"http://localhost:5099/api/atlas/{newAtlas.Id}")}, true, null);
+            return new Result<CreateAtlasCommandResponse>(new CreateAtlasCommandResponse() { Url = new Uri($"http://localhost:5099/api/atlas/{newAtlas.Id}") }, true, null);
         }
     }
 
@@ -72,7 +74,7 @@ namespace Cloud_Atlas_Dotnet.Application.Handlers
 
             var atlasList = await repository.GetAtlasForUser(request.UserId);
 
-            return new Result<GetAtlasForUserCommandResponse>(new GetAtlasForUserCommandResponse() { AtlasList = atlasList}, true, null);
+            return new Result<GetAtlasForUserCommandResponse>(new GetAtlasForUserCommandResponse() { AtlasList = atlasList }, true, null);
         }
     }
 
@@ -93,6 +95,41 @@ namespace Cloud_Atlas_Dotnet.Application.Handlers
             var atlasList = await repository.DeleteAtlas(request.AtlasId);
 
             return new Result(true, null);
+        }
+    }
+
+    public class GeocodeAtlasHandler : IRequestHandler<GeocodeAtlasCommand, Result>
+    {
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly IGeocodingService _geocodingService;
+
+        public GeocodeAtlasHandler(IServiceScopeFactory serviceScopeFactory, IGeocodingService geocodingService)
+        {
+            _serviceScopeFactory = serviceScopeFactory;
+            _geocodingService = geocodingService;
+        }
+
+        public async Task<Result> Handle(GeocodeAtlasCommand request, CancellationToken cancellationToken)
+        {
+            Coordinates coordinates = await _geocodingService.GeocodeAtlas(request.AtlasId, request.PlaceIdentifier);
+
+            if (coordinates is null)
+            {
+                return new Result(false, new ApplicationError(ErrorType.Failure,
+                    new Dictionary<string, object?>()
+                    {
+                        ["Location"] = request.PlaceIdentifier
+                    },
+                    "Failed to retrieve coordinates for location provided"));
+            }
+
+            using var scope = _serviceScopeFactory.CreateScope();
+            IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
+
+            var updated = await repository.AddCoordinatesToAtlas(request.AtlasId, coordinates);
+
+            if(updated) return new Result(true, null);
+            else return new Result(false, new ApplicationError(ErrorType.NotFound, null, "Atlas was not found"));
         }
     }
 }

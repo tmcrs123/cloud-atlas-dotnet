@@ -72,5 +72,21 @@ namespace Cloud_Atlas_Dotnet.Controllers
                 return Results.Problem(response.Error!.ProblemDetails); //this is safe, we check for this in Result class ctor
             }
         }
+
+        [HttpPost]
+        [Route("geocode")]
+        public async Task<IResult> AddCoordinatesToAtlas(GeocodeAtlasCommand request)
+        {
+            var response = await _mediator.Send(request);
+
+            if (response.IsSuccess)
+            {
+                return Results.Ok();
+            }
+            else
+            {
+                return Results.Problem(response.Error!.ProblemDetails); //this is safe, we check for this in Result class ctor
+            }
+        }
     }
 }

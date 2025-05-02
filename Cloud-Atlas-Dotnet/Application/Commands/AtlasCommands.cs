@@ -42,5 +42,6 @@ namespace Cloud_Atlas_Dotnet.Application.Commands
     public class GeocodeAtlasCommand : IRequest<Result>
     {
         public Guid AtlasId { get; set; }
+        public string PlaceIdentifier { get; set; }
     }
 }

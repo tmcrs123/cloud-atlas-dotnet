@@ -13,6 +13,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
         Task<User> GetUserByUsername(string username);
         Task<bool> VerifyAccount(Guid userId);
         Task<Atlas> CreateAtlas(string title, Guid userId);
+        Task<bool> AddCoordinatesToAtlas(Guid atlasId, Coordinates coordinates);
         Task<bool> UpdateAtlas(Guid atlasId, string title);
         Task<List<Atlas>> GetAtlasForUser(Guid userId);
         Task<bool> DeleteAtlas(Guid atlasId);

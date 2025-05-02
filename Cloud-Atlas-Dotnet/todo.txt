@@ -1,7 +1,7 @@
 ProblemDetails/CustomProblem details
 documentation
 serilog
-authorization
 tests
+database factory
 proper api responses and codes
 redis

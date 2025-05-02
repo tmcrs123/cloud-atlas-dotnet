@@ -287,6 +287,28 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
             }
         }
 
+        public async Task<bool> AddCoordinatesToAtlas(Guid atlasId, Coordinates coordinates)
+        {
+            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
+
+            using (connection)
+            {
+                connection.Open();
+
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "UPDATE atlas set coordinates=POINT(@lat,@lng) WHERE atlas_id=@atlas_id";
+
+                cmd.Parameters.AddWithValue("lat", coordinates.Lat);
+                cmd.Parameters.AddWithValue("lng", coordinates.Lng);
+                cmd.Parameters.AddWithValue("atlas_id", atlasId);
+
+                var rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                return rowsAffected == 1;
+            }
+        }
+
         public async Task<bool> DeleteAtlas(Guid atlasId)
         {
             var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
