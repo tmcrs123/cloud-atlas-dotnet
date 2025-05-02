@@ -1,4 +1,2 @@
-documentation
 tests
 proper api responses and codes
-redis

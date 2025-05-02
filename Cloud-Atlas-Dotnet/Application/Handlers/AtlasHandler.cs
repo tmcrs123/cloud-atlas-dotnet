@@ -4,6 +4,7 @@ using Cloud_Atlas_Dotnet.Domain.Entities;
 using Cloud_Atlas_Dotnet.Domain.Patterns;
 using Cloud_Atlas_Dotnet.Infrastructure.Database;
 using MediatorLibrary;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cloud_Atlas_Dotnet.Application.Handlers
@@ -61,10 +62,12 @@ namespace Cloud_Atlas_Dotnet.Application.Handlers
     public class GetAtlasHandler : IRequestHandler<GetAtlasForUserCommand, Result<GetAtlasForUserCommandResponse>>
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly HybridCache _cache;
 
-        public GetAtlasHandler(IServiceScopeFactory serviceScopeFactory)
+        public GetAtlasHandler(IServiceScopeFactory serviceScopeFactory, HybridCache cache)
         {
             _serviceScopeFactory = serviceScopeFactory;
+            _cache = cache;
         }
 
         public async Task<Result<GetAtlasForUserCommandResponse>> Handle(GetAtlasForUserCommand request, CancellationToken cancellationToken)
@@ -72,7 +75,10 @@ namespace Cloud_Atlas_Dotnet.Application.Handlers
             using var scope = _serviceScopeFactory.CreateScope();
             IRepository repository = scope.ServiceProvider.GetRequiredService<IRepository>();
 
-            var atlasList = await repository.GetAtlasForUser(request.UserId);
+            var atlasList = await _cache.GetOrCreateAsync(nameof(request) + request.UserId, async token =>
+            {
+                return await repository.GetAtlasForUser(request.UserId);
+            });
 
             return new Result<GetAtlasForUserCommandResponse>(new GetAtlasForUserCommandResponse() { AtlasList = atlasList }, true, null);
         }

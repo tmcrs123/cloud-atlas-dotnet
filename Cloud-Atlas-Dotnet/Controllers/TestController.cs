@@ -2,6 +2,7 @@
 using Cloud_Atlas_Dotnet.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Options;
 using System.Data;
 
@@ -10,12 +11,14 @@ namespace Cloud_Atlas_Dotnet.Controllers
     public class TestController : BaseController
     {
         private readonly ILogger<TestController> _logger;
+        private readonly HybridCache _cache;
         public IOptions<AppSettings> _appSettings { get; set; }
 
-        public TestController(ILogger<TestController> logger, IOptions<AppSettings> appSettings)
+        public TestController(ILogger<TestController> logger, IOptions<AppSettings> appSettings, HybridCache cache)
         {
             _logger = logger;
             _appSettings = appSettings;
+            _cache = cache;
         }
 
         [HttpGet]

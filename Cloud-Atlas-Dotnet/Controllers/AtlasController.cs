@@ -1,6 +1,7 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Commands;
 using MediatorLibrary;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace Cloud_Atlas_Dotnet.Controllers
 {

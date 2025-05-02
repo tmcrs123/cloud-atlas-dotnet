@@ -13,10 +13,10 @@ using Cloud_Atlas_Dotnet.Libraries.FluentValidation.Interfaces;
 using MediatorLibrary;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 using System.Text;
 
 namespace Cloud_Atlas_Dotnet
@@ -100,6 +100,14 @@ namespace Cloud_Atlas_Dotnet
         public static void ConfigureServices(this WebApplicationBuilder builder)
         {
             builder.Services.AddSingleton<IGeocodingService, GeocodingService>();
+        }
+
+        public static void ConfigureCaching(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddHybridCache(options =>
+            {
+                options.DefaultEntryOptions = new HybridCacheEntryOptions() { Expiration = TimeSpan.FromMinutes(2) };
+            });
         }
 
         public static void ConfigureAuthentication(this WebApplicationBuilder builder)

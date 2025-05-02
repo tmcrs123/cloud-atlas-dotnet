@@ -20,6 +20,7 @@ namespace Cloud_Atlas_Dotnet
             builder.ConfigureAuthentication();
             builder.ConfigureHttpClient();
             builder.ConfigureServices();
+            builder.ConfigureCaching();
 
             //response compression
             builder.Services.AddResponseCompression(options =>
