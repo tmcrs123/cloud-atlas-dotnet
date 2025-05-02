@@ -10,16 +10,17 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
     public class Repository : IRepository
     {
         private readonly IOptions<AppSettings> _settings;
-        public Repository(IOptions<AppSettings> settings)
+        private readonly IDatabaseConnectionFactory _dbConnectionFactory;
+
+        public Repository(IOptions<AppSettings> settings, IDatabaseConnectionFactory dbConnectionFactory)
         {
             _settings = settings;
+            _dbConnectionFactory = dbConnectionFactory;
         }
 
         public async Task<Guid> CreateUser(string name, string username, string email, string password)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -47,9 +48,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> UsernameExists(string username)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -76,9 +75,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<User> GetUser(Guid id)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -108,9 +105,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<User> GetUserByUsername(string username)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -139,9 +134,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> UpdateUser(string password, Guid id)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -160,9 +153,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> DeleteUser(Guid id)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -180,9 +171,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> VerifyAccount(Guid userId)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -200,9 +189,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<Atlas> CreateAtlas(string title, Guid userId)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            connection.Open();
+            var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
 
             await using (var transaction = await connection.BeginTransactionAsync())
             {
@@ -233,9 +220,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<List<Atlas>> GetAtlasForUser(Guid userId)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -268,9 +253,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
         }
         public async Task<bool> UpdateAtlas(Guid atlasId, string title)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -289,9 +272,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> AddCoordinatesToAtlas(Guid atlasId, Coordinates coordinates)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -311,9 +292,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> DeleteAtlas(Guid atlasId)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -331,9 +310,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> AddImageToAtlas(Guid atlasId, string legend, Uri imageUri)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -364,10 +341,8 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<List<Image>> GetImagesForAtlas(Guid atlasId)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
             List<Image> images = new();
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -383,7 +358,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                 {
                     Console.WriteLine(reader);
                     var img = JsonSerializer.Deserialize<Image>(reader.GetString(0));
-                    if(img is not null) images.Add(img);
+                    if (img is not null) images.Add(img);
                 }
 
                 return images;
@@ -392,9 +367,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> UpdateImageDetails(Guid atlasId, Guid imageId, string legend)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 
@@ -425,9 +398,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> DeleteImage(Guid atlasId, Guid imageId)
         {
-            var connection = new NpgsqlConnection(_settings.Value.DbConnectionString);
-
-            using (connection)
+            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
             {
                 connection.Open();
 

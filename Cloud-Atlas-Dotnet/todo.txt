@@ -1,7 +1,4 @@
-ProblemDetails/CustomProblem details
 documentation
-serilog
 tests
-database factory
 proper api responses and codes
 redis

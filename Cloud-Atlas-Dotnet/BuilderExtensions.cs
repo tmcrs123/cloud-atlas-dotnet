@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using System.Text;
 
 namespace Cloud_Atlas_Dotnet
@@ -51,6 +52,7 @@ namespace Cloud_Atlas_Dotnet
         public static void ConfigureInfrastructure(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IRepository, Repository>();
+            builder.Services.AddScoped<IDatabaseConnectionFactory, PostgresDatabaseConnectionFactory>();
         }
 
         public static void ConfigureValidations(this WebApplicationBuilder builder)
@@ -60,7 +62,7 @@ namespace Cloud_Atlas_Dotnet
             // Bind & Validate AppSettings
             builder.Services.AddOptions<AppSettings>().BindConfiguration("AppSettings").ValidateOnStart();
             builder.Services.AddSingleton<IValidateOptions<AppSettings>>(s => new AppSettingsValidator());
-            
+
             builder.Services.AddScoped<IValidator<CreateUserCommand>, CreateUserCommandValidator>();
 
             builder.Services.AddScoped<RequestBodyValidationFilter>();
@@ -132,7 +134,7 @@ namespace Cloud_Atlas_Dotnet
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:JwtSecretKey"])),
-                    ClockSkew = TimeSpan.Zero                    
+                    ClockSkew = TimeSpan.Zero
                 };
             });
         }
