@@ -8,13 +8,11 @@ namespace Cloud_Atlas_Dotnet.Application.Filters
     public class RequestBodyRedactionFilter : IActionFilter
     {
         private readonly ILogger<RequestBodyRedactionFilter> _logger;
-        private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public RequestBodyRedactionFilter(ILogger<RequestBodyRedactionFilter> logger, IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+        public RequestBodyRedactionFilter(ILogger<RequestBodyRedactionFilter> logger, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
-            _configuration = configuration;
             _webHostEnvironment = webHostEnvironment;
         }
 
@@ -22,7 +20,7 @@ namespace Cloud_Atlas_Dotnet.Application.Filters
         {
         }
 
-        void IActionFilter.OnActionExecuting(ActionExecutingContext context)
+        public void OnActionExecuting(ActionExecutingContext context)
         {
             if (_webHostEnvironment.IsProduction())
             {
@@ -39,7 +37,13 @@ namespace Cloud_Atlas_Dotnet.Application.Filters
                         jsonNode[property.Name] = new string('*', 5);
                     }
                 }
-                _logger.LogInformation(jsonNode.ToJsonString());
+
+                _logger.Log<string>(LogLevel.Information,
+                    0,
+                    jsonNode.ToJsonString(),
+                    null,
+                    null
+                    );
             };
         }
     }
