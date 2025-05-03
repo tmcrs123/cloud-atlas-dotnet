@@ -26,7 +26,7 @@ namespace Cloud_Atlas_Dotnet.Application.Services
 
         public async Task<Coordinates> GeocodeAtlas(Guid atlasId, string placeIdentifier)
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("GeocodingClient");
 
             StringBuilder sb = new StringBuilder("https://api.geoapify.com/v1/geocode/search?limit=1");
 
@@ -41,11 +41,12 @@ namespace Cloud_Atlas_Dotnet.Application.Services
 
             var json = await msg.Content.ReadAsStringAsync();
 
-            JsonDocument jdoc = JsonDocument.Parse(json);
+            JsonDocument jdoc;
             JsonElement jsonCoordinates;
 
             try
             {
+                jdoc = JsonDocument.Parse(json);
                 jsonCoordinates = jdoc.RootElement
                 .GetProperty("features")[0]
                 .GetProperty("geometry")
