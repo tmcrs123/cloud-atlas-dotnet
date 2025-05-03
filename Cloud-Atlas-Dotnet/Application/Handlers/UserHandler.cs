@@ -6,7 +6,6 @@ using MediatorLibrary;
 
 namespace Cloud_Atlas_Dotnet.Application.Handlers
 {
-
     public class CreateUserHandler : IRequestHandler<CreateUserCommand, Result<CreateUserCommandResponse>>
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
