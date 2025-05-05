@@ -1,5 +1,4 @@
-﻿using Castle.Core.Logging;
-using Cloud_Atlas_Dotnet.Application.Filters;
+﻿using Cloud_Atlas_Dotnet.Application.Filters;
 using Cloud_Atlas_Dotnet.Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,12 +9,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit.Sdk;
 
 namespace Cloud_Atlas_Dotnet_Tests
 {
