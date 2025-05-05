@@ -1,6 +1,5 @@
 ﻿using Cloud_Atlas_Dotnet.Application.Configuration;
 using Cloud_Atlas_Dotnet.Domain.Entities;
-using Microsoft.Extensions.Options;
 using Npgsql;
 using System.Data;
 using System.Text.Json;
@@ -9,30 +8,26 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 {
     public class Repository : IRepository
     {
-        private readonly IOptions<AppSettings> _settings;
         private readonly IDatabaseConnectionFactory _dbConnectionFactory;
 
-        public Repository(IOptions<AppSettings> settings, IDatabaseConnectionFactory dbConnectionFactory)
+        public Repository(IDatabaseConnectionFactory dbConnectionFactory)
         {
-            _settings = settings;
             _dbConnectionFactory = dbConnectionFactory;
         }
 
         public async Task<Guid> CreateUser(string name, string username, string email, string password)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
-
                 var cmd = connection.CreateCommand();
 
                 cmd.CommandText = "insert into users (name, username,email,password) values (@name, @username,@email,@password) returning Id";
-
-                cmd.Parameters.AddWithValue("name", name);
-                cmd.Parameters.AddWithValue("username", username);
-                cmd.Parameters.AddWithValue("email", email);
-                cmd.Parameters.AddWithValue("password", password);
-
+                cmd.Parameters.Add(new NpgsqlParameter("name", NpgsqlTypes.NpgsqlDbType.Text) {Value = name });
+                cmd.Parameters.Add(new NpgsqlParameter("username", NpgsqlTypes.NpgsqlDbType.Text) { Value = username });
+                cmd.Parameters.Add(new NpgsqlParameter("email", NpgsqlTypes.NpgsqlDbType.Text) { Value = email });
+                cmd.Parameters.Add(new NpgsqlParameter("password", NpgsqlTypes.NpgsqlDbType.Text) { Value = password });
+                
                 var result = await cmd.ExecuteScalarAsync();
 
                 if (result is Guid newUserId)
@@ -48,7 +43,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> UsernameExists(string username)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -56,7 +51,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 cmd.CommandText = "select COUNT(id) from users where username=@username";
 
-                cmd.Parameters.AddWithValue("username", username);
+                cmd.Parameters.Add(new NpgsqlParameter("username", NpgsqlTypes.NpgsqlDbType.Text) { Value = username });
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -75,7 +70,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<User> GetUser(Guid id)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -83,7 +78,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 cmd.CommandText = "select id, name, username, email from users where id = @id";
 
-                cmd.Parameters.AddWithValue("id", id);
+                cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = id });
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -105,7 +100,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<User> GetUserByUsername(string username)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -113,7 +108,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 cmd.CommandText = "select id, name, username, email, password from users where username = @username";
 
-                cmd.Parameters.AddWithValue("username", username);
+                cmd.Parameters.Add(new NpgsqlParameter("username", NpgsqlTypes.NpgsqlDbType.Text) { Value = username });
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -134,16 +129,16 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> UpdateUser(string password, Guid id)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
                 var cmd = connection.CreateCommand();
 
-                cmd.CommandText = "UPDATE users set password=@password WHERE Id=@id";
+                cmd.CommandText = "UPDATE users set password=@password WHERE id=@id";
 
-                cmd.Parameters.AddWithValue("password", password);
-                cmd.Parameters.AddWithValue("id", id);
+                cmd.Parameters.Add(new NpgsqlParameter("password", NpgsqlTypes.NpgsqlDbType.Text) { Value = password });
+                cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = id });
 
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
@@ -153,15 +148,15 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> DeleteUser(Guid id)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
                 var cmd = connection.CreateCommand();
 
-                cmd.CommandText = "DELETE FROM users WHERE Id=@id";
-
-                cmd.Parameters.AddWithValue("id", id);
+                cmd.CommandText = "DELETE FROM users WHERE id=@id";
+                
+                cmd.Parameters.Add(new NpgsqlParameter("id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = id });
 
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
@@ -171,7 +166,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> VerifyAccount(Guid userId)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -179,7 +174,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 cmd.CommandText = "UPDATE accounts set verified=true WHERE user_id=@userId";
 
-                cmd.Parameters.AddWithValue("userId", userId);
+                cmd.Parameters.Add(new NpgsqlParameter("userId", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = userId });
 
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
@@ -189,15 +184,15 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<Atlas> CreateAtlas(string title, Guid userId)
         {
-            var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            var connection = _dbConnectionFactory.CreateConnection();
 
-            await using (var transaction = await connection.BeginTransactionAsync())
+            using (var transaction = await connection.BeginTransactionAsync())
             {
                 using var insertAtlasCommand = connection.CreateCommand();
 
                 insertAtlasCommand.Transaction = transaction;
                 insertAtlasCommand.CommandText = "insert into atlas (title) values (@title) RETURNING atlas_id";
-                insertAtlasCommand.Parameters.AddWithValue("title", title);
+                insertAtlasCommand.Parameters.Add(new NpgsqlParameter("title", NpgsqlTypes.NpgsqlDbType.Text) { Value = title });
 
                 var atlasId = await insertAtlasCommand.ExecuteScalarAsync();
 
@@ -207,8 +202,8 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 insertOwnerCommand.Transaction = transaction;
                 insertOwnerCommand.CommandText = "insert into owners (owner_id, atlas_id) values (@owner_id, @atlas_id)";
-                insertOwnerCommand.Parameters.AddWithValue("owner_id", userId);
-                insertOwnerCommand.Parameters.AddWithValue("atlas_id", (Guid)atlasId);
+                insertOwnerCommand.Parameters.Add(new NpgsqlParameter("owner_id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = userId });
+                insertOwnerCommand.Parameters.Add(new NpgsqlParameter("atlas_id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = (Guid)atlasId });
 
                 await insertOwnerCommand.ExecuteNonQueryAsync();
 
@@ -220,7 +215,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<List<Atlas>> GetAtlasForUser(Guid userId)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -234,7 +229,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                 where o.owner_id = @owner_id
                 ";
 
-                cmd.Parameters.AddWithValue("owner_id", userId);
+                cmd.Parameters.Add(new NpgsqlParameter("owner_id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = userId });
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -253,7 +248,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
         }
         public async Task<bool> UpdateAtlas(Guid atlasId, string title)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -261,8 +256,9 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 cmd.CommandText = "UPDATE atlas set title=@title WHERE atlas_id=@atlas_id";
 
-                cmd.Parameters.AddWithValue("atlas_id", atlasId);
-                cmd.Parameters.AddWithValue("title", title);
+
+                cmd.Parameters.Add(new NpgsqlParameter("atlas_id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = atlasId });
+                cmd.Parameters.Add(new NpgsqlParameter("title", NpgsqlTypes.NpgsqlDbType.Text) { Value = title });
 
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
@@ -272,17 +268,17 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> AddCoordinatesToAtlas(Guid atlasId, Coordinates coordinates)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
                 using var cmd = connection.CreateCommand();
 
                 cmd.CommandText = "UPDATE atlas set coordinates=POINT(@lat,@lng) WHERE atlas_id=@atlas_id";
-
-                cmd.Parameters.AddWithValue("lat", coordinates.Lat);
-                cmd.Parameters.AddWithValue("lng", coordinates.Lng);
-                cmd.Parameters.AddWithValue("atlas_id", atlasId);
+                
+                cmd.Parameters.Add(new NpgsqlParameter("lat", NpgsqlTypes.NpgsqlDbType.Point) { Value = coordinates.Lat });
+                cmd.Parameters.Add(new NpgsqlParameter("lng", NpgsqlTypes.NpgsqlDbType.Point) { Value = coordinates.Lng });
+                cmd.Parameters.Add(new NpgsqlParameter("atlas_id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = atlasId });
 
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
@@ -292,7 +288,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> DeleteAtlas(Guid atlasId)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -300,7 +296,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 cmd.CommandText = "DELETE FROM atlas WHERE atlas_id=@atlas_id";
 
-                cmd.Parameters.AddWithValue("atlas_id", atlasId);
+                cmd.Parameters.Add(new NpgsqlParameter("atlas_id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = atlasId });
 
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
@@ -310,7 +306,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> AddImageToAtlas(Guid atlasId, string legend, Uri imageUri)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -319,9 +315,9 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                 cmd.CommandText = "INSERT_IMAGE";
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("id_of_atlas", atlasId);
-                cmd.Parameters.AddWithValue("legend", legend);
-                cmd.Parameters.AddWithValue("image_url", imageUri.ToString());
+                cmd.Parameters.Add(new NpgsqlParameter("id_of_atlas", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = atlasId });
+                cmd.Parameters.Add(new NpgsqlParameter("legend", NpgsqlTypes.NpgsqlDbType.Text) { Value = legend });
+                cmd.Parameters.Add(new NpgsqlParameter("image_url", NpgsqlTypes.NpgsqlDbType.Text) { Value = imageUri.ToString() });
 
                 var affectedRowsParam = new NpgsqlParameter("affected_rows", DbType.Int32)
                 {
@@ -342,7 +338,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
         public async Task<List<Image>> GetImagesForAtlas(Guid atlasId)
         {
             List<Image> images = new();
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -350,7 +346,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
                 cmd.CommandText = "SELECT jsonb_array_elements(image_details) FROM IMAGES WHERE ATLAS_ID=@atlas_id";
 
-                cmd.Parameters.AddWithValue("atlas_id", atlasId);
+                cmd.Parameters.Add(new NpgsqlParameter("atlas_id", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = atlasId });
 
                 using var reader = await cmd.ExecuteReaderAsync();
 
@@ -367,7 +363,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> UpdateImageDetails(Guid atlasId, Guid imageId, string legend)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -376,10 +372,10 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                 cmd.CommandText = "UPDATE_IMAGE";
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("id_of_atlas", atlasId);
-                cmd.Parameters.AddWithValue("image_id", imageId.ToString());
-                cmd.Parameters.AddWithValue("legend", legend);
-
+                cmd.Parameters.Add(new NpgsqlParameter("id_of_atlas", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = atlasId });
+                cmd.Parameters.Add(new NpgsqlParameter("legend", NpgsqlTypes.NpgsqlDbType.Text) { Value = legend });
+                cmd.Parameters.Add(new NpgsqlParameter("image_url", NpgsqlTypes.NpgsqlDbType.Text) { Value = imageId.ToString() });
+                
                 var affectedRowsParam = new NpgsqlParameter("affected_rows", DbType.Int32)
                 {
                     Direction = ParameterDirection.Output
@@ -398,7 +394,7 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
 
         public async Task<bool> DeleteImage(Guid atlasId, Guid imageId)
         {
-            using var connection = _dbConnectionFactory.CreateConnection<NpgsqlConnection>();
+            using var connection = _dbConnectionFactory.CreateConnection();
             {
                 connection.Open();
 
@@ -407,8 +403,8 @@ namespace Cloud_Atlas_Dotnet.Infrastructure.Database
                 cmd.CommandText = "DELETE_IMAGE";
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("id_of_atlas", atlasId);
-                cmd.Parameters.AddWithValue("image_id", imageId.ToString());
+                cmd.Parameters.Add(new NpgsqlParameter("id_of_atlas", NpgsqlTypes.NpgsqlDbType.Uuid) { Value = atlasId });
+                cmd.Parameters.Add(new NpgsqlParameter("image_id", NpgsqlTypes.NpgsqlDbType.Text) { Value = imageId.ToString() });
 
                 var affectedRowsParam = new NpgsqlParameter("affected_rows", DbType.Int32)
                 {
